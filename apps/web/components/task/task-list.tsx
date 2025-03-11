@@ -76,7 +76,7 @@ export default function TaskList({
       <Alert variant="default" className="bg-muted border-dashed">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          No tasks yet. Click the &quot;New Task&quot; button to add one.
+          暫無任務。請點擊「新增任務」按鈕來添加一個。
         </AlertDescription>
       </Alert>
     );

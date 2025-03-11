@@ -47,7 +47,7 @@ export default function TaskStats({ tasks }: TaskStatsProps) {
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Task Completion</CardTitle>
+          <CardTitle className="text-sm font-medium">任務完成度</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ export default function TaskStats({ tasks }: TaskStatsProps) {
               </span>
             </div>
             <div className="text-sm text-muted-foreground">
-              {stats.completed} of {stats.total} tasks
+              {stats.completed} / {stats.total} 個任務
             </div>
           </div>
           <Progress value={stats.completionRate} className="h-2 mt-2" />
@@ -66,7 +66,7 @@ export default function TaskStats({ tasks }: TaskStatsProps) {
             <div className="flex items-center gap-2 mt-4 text-sm text-destructive">
               <Clock className="h-4 w-4" />
               <span>
-                {stats.overdue} overdue {stats.overdue === 1 ? "task" : "tasks"}
+                {stats.overdue} 個已逾期{stats.overdue === 1 ? "任務" : "任務"}
               </span>
             </div>
           )}
@@ -75,18 +75,31 @@ export default function TaskStats({ tasks }: TaskStatsProps) {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Task Status</CardTitle>
+          <CardTitle className="text-sm font-medium">任務狀態</CardTitle>
         </CardHeader>
-        <CardContent className="h-[180px]"></CardContent>
+        <CardContent className="h-[180px]">
+          <div className="flex flex-col gap-2 mt-2">
+            <div>進行中：{stats.total - stats.completed} 個任務</div>
+            <div>已完成：{stats.completed} 個任務</div>
+            <div>已逾期：{stats.overdue} 個任務</div>
+          </div>
+        </CardContent>
       </Card>
 
       <Card className="md:col-span-2">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">
-            Tasks by Priority
+            依優先度分類的任務
           </CardTitle>
         </CardHeader>
-        <CardContent className="h-[200px]"></CardContent>
+        <CardContent className="h-[200px]">
+          <div className="flex flex-col gap-2 mt-2">
+            <div>低優先度：{stats.priorityCounts.low} 個任務</div>
+            <div>中優先度：{stats.priorityCounts.medium} 個任務</div>
+            <div>高優先度：{stats.priorityCounts.high} 個任務</div>
+            <div>緊急：{stats.priorityCounts.urgent} 個任務</div>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

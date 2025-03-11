@@ -13,9 +13,9 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 import { format } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { Pencil, Trash2, Clock, Flag, MoreHorizontal } from "lucide-react";
-import { useState, useEffect } from "react";
 
 interface TaskItemProps {
   task: Task;
@@ -30,20 +30,7 @@ export default function TaskItem({
   onToggleCompletion,
   onEdit,
   onDelete,
-  index,
 }: TaskItemProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Update time every minute
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
-
   const priorityColors = {
     low: { text: "text-green-600", bg: "bg-green-100 dark:bg-green-950" },
     medium: { text: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-950" },
@@ -52,10 +39,10 @@ export default function TaskItem({
   };
 
   const priorityLabels = {
-    low: "Low",
-    medium: "Medium",
-    high: "High",
-    urgent: "Urgent",
+    low: "低",
+    medium: "中",
+    high: "高",
+    urgent: "緊急",
   };
 
   const handleToggleCompletion = () => {
@@ -69,8 +56,6 @@ export default function TaskItem({
         task.completed ? "border-muted" : "border-border",
       )}
       whileHover={{ scale: 1.005 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -113,7 +98,7 @@ export default function TaskItem({
             </motion.h3>
           </div>
           <div className="text-sm text-muted-foreground whitespace-nowrap">
-            {format(new Date(task.createdAt), "PPP")}
+            {format(new Date(task.createdAt), "PPP", { locale: zhTW })}
           </div>
         </div>
         {task.description && (
@@ -158,7 +143,9 @@ export default function TaskItem({
                 )}
               >
                 <Clock className="h-3 w-3" />
-                <span>{format(new Date(task.dueAt), "PPP p")}</span>
+                <span>
+                  {format(new Date(task.dueAt), "PPP p", { locale: zhTW })}
+                </span>
               </Badge>
             )}
           </div>
@@ -171,7 +158,7 @@ export default function TaskItem({
               onClick={() => onEdit(task)}
             >
               <Pencil className="h-3 w-3" />
-              <span className="sr-only">Edit</span>
+              <span className="sr-only">編輯</span>
             </Button>
 
             <Separator orientation="vertical" className="h-5" />
@@ -184,7 +171,7 @@ export default function TaskItem({
                   className="h-8 w-8 p-0 rounded-none"
                 >
                   <MoreHorizontal className="h-3 w-3" />
-                  <span className="sr-only">More options</span>
+                  <span className="sr-only">更多選項</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[160px]">
@@ -193,7 +180,7 @@ export default function TaskItem({
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-3 w-3" />
-                  Delete
+                  刪除
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

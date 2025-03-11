@@ -29,6 +29,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { TimePicker } from "@workspace/ui/components/time-picker";
 import { cn } from "@workspace/ui/lib/utils";
 import { format } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { CalendarIcon, X } from "lucide-react";
 import type React from "react";
@@ -131,7 +132,7 @@ export default function TaskForm({
           <form onSubmit={handleSubmit}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xl">
-                {initialData ? "Edit Task" : "Create New Task"}
+                {initialData ? "編輯任務" : "新增任務"}
               </CardTitle>
               <Button
                 type="button"
@@ -141,7 +142,7 @@ export default function TaskForm({
                 className="rounded-full hover:bg-muted"
               >
                 <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">關閉</span>
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -150,11 +151,11 @@ export default function TaskForm({
                   htmlFor="task-title"
                   className="text-sm font-normal text-muted-foreground"
                 >
-                  Title
+                  標題
                 </Label>
                 <Input
                   id="task-title"
-                  placeholder="Task title"
+                  placeholder="輸入任務標題"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -166,11 +167,11 @@ export default function TaskForm({
                   htmlFor="task-description"
                   className="text-sm font-normal text-muted-foreground"
                 >
-                  Description (optional)
+                  描述 (選填)
                 </Label>
                 <Textarea
                   id="task-description"
-                  placeholder="Add details about this task"
+                  placeholder="新增任務細節"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
@@ -183,26 +184,26 @@ export default function TaskForm({
                     htmlFor="task-priority"
                     className="text-sm font-normal text-muted-foreground"
                   >
-                    Priority
+                    優先級
                   </Label>
                   <Select value={priority} onValueChange={setPriority}>
                     <SelectTrigger
                       id="task-priority"
                       className="border-none bg-muted focus:ring-0"
                     >
-                      <SelectValue placeholder="Select priority" />
+                      <SelectValue placeholder="選擇優先級" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">🟢 Low</SelectItem>
-                      <SelectItem value="medium">🔵 Medium</SelectItem>
-                      <SelectItem value="high">🟡 High</SelectItem>
-                      <SelectItem value="urgent">🔴 Urgent</SelectItem>
+                      <SelectItem value="low">🟢 低</SelectItem>
+                      <SelectItem value="medium">🔵 中</SelectItem>
+                      <SelectItem value="high">🟡 高</SelectItem>
+                      <SelectItem value="urgent">🔴 緊急</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-normal text-muted-foreground">
-                    Due Date (optional)
+                    截止日期 (選填)
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -214,7 +215,9 @@ export default function TaskForm({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dueDate ? format(dueDate, "PPP p") : "Pick a date"}
+                        {dueDate
+                          ? format(dueDate, "PPP p", { locale: zhTW })
+                          : "選擇日期"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 flex flex-col items-center justify-center">
@@ -224,7 +227,7 @@ export default function TaskForm({
                         onSelect={setDueDate}
                         initialFocus
                       />
-                      {/* Time Picker */}
+                      {/* 時間選擇器 */}
                       <TimePicker
                         date={dueDate || new Date()}
                         setDate={setDueDate}
@@ -242,7 +245,7 @@ export default function TaskForm({
                 onClick={onClose}
                 className="rounded-full"
               >
-                Cancel
+                取消
               </Button>
               <Button
                 type="submit"
@@ -250,7 +253,7 @@ export default function TaskForm({
                 className="rounded-full"
                 loading={isLoading}
               >
-                {initialData ? "Update" : "Create"} Task
+                {initialData ? "更新任務" : "建立任務"}
               </Button>
             </CardFooter>
           </form>

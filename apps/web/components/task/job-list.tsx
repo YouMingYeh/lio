@@ -1,12 +1,9 @@
-import { deleteJobById } from "@/lib/data/job/action";
 import { Job } from "@/types/database";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import {
@@ -32,13 +29,13 @@ export function JobList({
 }) {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption>您的工作列表</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Name</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Schedule</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead className="w-[100px]">名稱</TableHead>
+          <TableHead>狀態</TableHead>
+          <TableHead>排程</TableHead>
+          <TableHead className="text-right">操作</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -57,11 +54,11 @@ export function JobList({
                 <DropdownMenuContent>
                   <DropdownMenuItem onSelect={() => onDelete(job.id)}>
                     <Trash />
-                    Delete
+                    刪除
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => onPause(job.id)}>
                     <Pause />
-                    Paused
+                    暫停
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -71,8 +68,8 @@ export function JobList({
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
+          <TableCell colSpan={3}>總計</TableCell>
+          <TableCell className="text-right">{jobs.length} 個工作</TableCell>
         </TableRow>
       </TableFooter>
     </Table>

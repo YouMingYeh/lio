@@ -53,12 +53,12 @@ export default function TaskDashboard() {
   useEffect(() => {
     const fetchTasks = async () => {
       if (!user) {
-        toast.error("Failed to fetch tasks");
+        toast.error("無法獲取任務");
         return;
       }
       const { data } = await getTasksByUserId(user.id);
       if (!data) {
-        toast.error("Failed to fetch tasks");
+        toast.error("無法獲取任務");
         return;
       }
       setTasks(data);
@@ -69,12 +69,12 @@ export default function TaskDashboard() {
   useEffect(() => {
     const fetchJobs = async () => {
       if (!user) {
-        toast.error("Failed to fetch jobs");
+        toast.error("無法獲取工作");
         return;
       }
       const { data } = await getJobsByUserId(user.id);
       if (!data) {
-        toast.error("Failed to fetch jobs");
+        toast.error("無法獲取工作");
         return;
       }
       setJobs(data);
@@ -98,37 +98,37 @@ export default function TaskDashboard() {
   const addTask = async (task: TaskInsert) => {
     const { data } = await createTask(task);
     if (!data) {
-      toast.error("Failed to add task");
+      toast.error("無法新增任務");
       return;
     }
     setTasks((prev) => [...prev, data]);
     setCustomOrder((prev) => [...prev, data.id]);
-    toast.success("Task added");
+    toast.success("任務已新增");
   };
 
   const updateTask = async (id: string, updatedTask: TaskUpdate) => {
     const { data } = await updateTaskById(id, updatedTask);
     if (!data) {
-      toast.error("Failed to update task");
+      toast.error("無法更新任務");
       return;
     }
     const updatedTasks = tasks.map((task) =>
       task.id === updatedTask.id ? data : task,
     );
     setTasks(updatedTasks);
-    toast.success("Task updated");
+    toast.success("任務已更新");
   };
 
   const deleteTask = async (id: string) => {
     const { error } = await deleteTaskById(id);
     if (error) {
-      toast.error("Failed to delete task");
+      toast.error("無法刪除任務");
       return;
     }
     const updatedTasks = tasks.filter((task) => task.id !== id);
     setTasks(updatedTasks);
     setCustomOrder((prev) => prev.filter((taskId) => taskId !== id));
-    toast.success("Task deleted");
+    toast.success("任務已刪除");
   };
 
   const toggleTaskCompletion = (id: string) => {
@@ -173,12 +173,12 @@ export default function TaskDashboard() {
   const handleDeletJob = async (id: string) => {
     const { error } = await deleteJobById(id);
     if (error) {
-      toast.error("Failed to delete job");
+      toast.error("無法刪除工作");
       return;
     }
     const updatedJobs = jobs.filter((job) => job.id !== id);
     setJobs(updatedJobs);
-    toast.success("Job deleted");
+    toast.success("工作已刪除");
   };
 
   const handlePauseJob = async (id: string) => {
@@ -186,12 +186,12 @@ export default function TaskDashboard() {
       status: "paused",
     });
     if (!data) {
-      toast.error("Failed to pause job");
+      toast.error("無法暫停工作");
       return;
     }
     const updatedJobs = jobs.map((job) => (job.id === id ? data : job));
     setJobs(updatedJobs);
-    toast.success("Job paused");
+    toast.success("工作已暫停");
   };
 
   const sortTasks = (tasksToSort: Task[]): Task[] => {
@@ -313,15 +313,15 @@ export default function TaskDashboard() {
           <TabsList className="grid w-full grid-cols-3 ">
             <TabsTrigger value="list" className="gap-1 ">
               <List className="h-4 w-4" />
-              <span>List</span>
+              <span>清單</span>
             </TabsTrigger>
             <TabsTrigger value="stats" className="gap-1 ">
               <BarChart2 className="h-4 w-4" />
-              <span>Stats</span>
+              <span>統計</span>
             </TabsTrigger>
             <TabsTrigger value="job" className="gap-1 ">
               <CirclePlay className="h-4 w-4" />
-              <span>Job</span>
+              <span>工作</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -338,7 +338,7 @@ export default function TaskDashboard() {
               onClick={() => setSortOption("priority")}
             >
               <Filter className="h-3.5 w-3.5" />
-              <span>Priority</span>
+              <span>優先度</span>
             </Button>
 
             <Button
@@ -351,7 +351,7 @@ export default function TaskDashboard() {
               onClick={() => setSortOption("dueDate")}
             >
               <Calendar className="h-3.5 w-3.5" />
-              <span>Due Date</span>
+              <span>截止日期</span>
             </Button>
 
             <Button
@@ -364,9 +364,7 @@ export default function TaskDashboard() {
               onClick={toggleIncompleteFirst}
             >
               <ArrowDownUp className="h-3.5 w-3.5" />
-              <span>
-                {incompleteFirst ? "Incomplete First" : "Custom Order"}
-              </span>
+              <span>{incompleteFirst ? "未完成優先" : "自訂排序"}</span>
             </Button>
           </div>
 
@@ -376,18 +374,14 @@ export default function TaskDashboard() {
               size="icon"
               className="rounded-full"
               onClick={toggleTheme}
-              title={
-                theme === "dark"
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
-              }
+              title={theme === "dark" ? "切換至亮色模式" : "切換至暗色模式"}
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
               ) : (
                 <Moon className="h-4 w-4" />
               )}
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">切換主題</span>
             </Button>
 
             <Button

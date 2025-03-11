@@ -37,7 +37,7 @@ export function TimePicker({ date, setDate, className }: TimePickerProps) {
     <div className={cn("flex items-center gap-2", className)}>
       <Clock className="h-4 w-4 text-muted-foreground" />
       <Select
-        value={date.getHours().toString().padStart(2, "0")}
+        value={date.getHours().toString()}
         onValueChange={handleHourChange}
       >
         <SelectTrigger className="w-[70px]">
@@ -46,14 +46,14 @@ export function TimePicker({ date, setDate, className }: TimePickerProps) {
         <SelectContent>
           {hoursList.map((hour) => (
             <SelectItem key={hour} value={hour.toString()}>
-              {hour.toString().padStart(2, "0")}
+              {hour.toString()}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <span className="text-muted-foreground">:</span>
       <Select
-        value={date.getMinutes().toString().padStart(2, "0")}
+        value={date.getMinutes().toString()}
         onValueChange={handleMinuteChange}
       >
         <SelectTrigger className="w-[70px]">
@@ -62,7 +62,7 @@ export function TimePicker({ date, setDate, className }: TimePickerProps) {
         <SelectContent>
           {minutesList.map((minute) => (
             <SelectItem key={minute} value={minute.toString()}>
-              {minute.toString().padStart(2, "0")}
+              {minute.toString()}
             </SelectItem>
           ))}
         </SelectContent>
