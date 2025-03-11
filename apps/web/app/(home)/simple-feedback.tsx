@@ -5,8 +5,8 @@ import { createFeedback } from "@/lib/data/feedback/action";
 import { BlurFade } from "@workspace/ui/components/blur-fade";
 import { Button } from "@workspace/ui/components/button";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 
 export default function SimpleFeedback({ data }: { data: string[] }) {

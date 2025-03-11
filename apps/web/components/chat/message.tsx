@@ -13,8 +13,8 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 import type { ChatRequestOptions, Message } from "ai";
 import equal from "fast-deep-equal";
-import { AnimatePresence, motion } from "framer-motion";
 import { Circle, CircleDashed, PencilIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { memo, useState } from "react";
 
 const PurePreviewMessage = ({

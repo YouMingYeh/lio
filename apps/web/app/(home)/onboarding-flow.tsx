@@ -12,8 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { AnimatePresence, motion } from "framer-motion";
 import { FastForward } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 export function OnboardingFlow() {

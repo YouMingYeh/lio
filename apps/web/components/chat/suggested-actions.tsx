@@ -2,7 +2,7 @@
 
 import { Button } from "@workspace/ui/components/button";
 import { ChatRequestOptions, CreateMessage, Message } from "ai";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { memo } from "react";
 
 interface SuggestedActionsProps {

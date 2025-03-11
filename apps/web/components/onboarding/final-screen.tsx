@@ -1,7 +1,7 @@
 "use client";
 
 import { RainbowButton } from "@workspace/ui/components/rainbow-button";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 interface FinalScreenProps {
   onComplete: () => void;

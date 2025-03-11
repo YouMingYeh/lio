@@ -1,11 +1,5 @@
 import { CoreMessage } from "ai";
-import { clsx } from "clsx";
 import { js_beautify } from "js-beautify";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: (string | undefined | boolean)[]) {
-  return twMerge(clsx(inputs));
-}
 
 /**
  * Converts the first character of a string to uppercase and the rest to lowercase.
