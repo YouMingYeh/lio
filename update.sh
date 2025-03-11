@@ -41,11 +41,11 @@ docker service update --image ghcr.io/youmingyeh/lio-line:latest lio-line_line-a
 echo "Cleaning up unused Docker resources..."
 docker system prune -f
 
-# echo "Building and deploying the web..."
-# DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose up -d --build
+echo "Building and deploying the web..."
+DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose up -d --build
 
-# echo "Removing unused Docker images and containers..."
-# docker image prune -f
-# docker container prune -f
+echo "Removing unused Docker images and containers..."
+docker image prune -f
+docker container prune -f
 
 echo "Deployment complete!"
