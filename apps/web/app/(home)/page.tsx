@@ -4,7 +4,7 @@ import { OnboardingFlow } from "./onboarding-flow";
 import SimpleFeedback from "./simple-feedback";
 import FeedbackDialog from "@/components/home/feedback-dialog";
 import { FooterSection } from "@/components/home/footer";
-import TaskDashboard from "@/components/task-dashboard";
+import TaskDashboard from "@/components/task/task-dashboard";
 import { useLiff } from "@/hooks/use-liff";
 import { useUser } from "@/hooks/use-user";
 import { Button } from "@workspace/ui/components/button";

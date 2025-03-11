@@ -1,6 +1,6 @@
 "use client";
 
-import TaskItem from "@/components/task-item";
+import TaskItem from "@/components/task/task-item";
 import { Task } from "@/types/database";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";

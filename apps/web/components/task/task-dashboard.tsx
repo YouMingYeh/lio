@@ -1,9 +1,9 @@
 "use client";
 
 import { JobList } from "./job-list";
-import TaskForm from "@/components/task-form";
-import TaskList from "@/components/task-list";
-import TaskStats from "@/components/task-stats";
+import TaskForm from "@/components/task/task-form";
+import TaskList from "@/components/task/task-list";
+import TaskStats from "@/components/task/task-stats";
 import { useUser } from "@/hooks/use-user";
 import {
   deleteJobById,
