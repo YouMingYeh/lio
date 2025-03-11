@@ -19,6 +19,7 @@
     "@line/bot-sdk": "^9.7.1",
     "@supabase/supabase-js": "^2.49.1",
     "ai": "^4.1.47",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "elevenlabs": "^1.53.0",
     "express": "^4.21.2",

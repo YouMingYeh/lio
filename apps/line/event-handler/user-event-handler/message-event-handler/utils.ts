@@ -6,7 +6,6 @@ import { removeMarkdown } from "@/lib/utils.js";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
-import { YoutubeLoader } from "@langchain/community/document_loaders/web/youtube";
 import { messagingApi } from "@line/bot-sdk";
 import {
   CoreMessage,
@@ -17,6 +16,8 @@ import {
   NoSuchToolError,
   tool,
 } from "ai";
+import { format } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { ElevenLabsClient } from "elevenlabs";
 import { z } from "zod";
 
@@ -298,6 +299,19 @@ export const buildSystemPrompt = async (
   tasks: Task[],
   user: User,
 ): Promise<string> => {
+  const taskText = tasks
+    .filter((task) => !task.completed)
+    .map(
+      (task) =>
+        `${task.title}  ${task.description}（${task.priority}）截止日期：${
+          task.dueAt
+            ? format(task.dueAt, "PPP p", {
+                locale: zhTW,
+              })
+            : "無"
+        }}`,
+    );
+
   return `你是 Lio，一個專業、友善、簡潔的 AI 待辦助理，透過 LINE 和使用者互動。你的主要任務是協助使用者高效地管理日常任務與做決策。你的核心設計目標是提供結構化、個人化的支援，讓使用者以最少的操作完成任務管理並提升生活效率。
 
 與你對話的使用者資訊在 <userInfo> 中。
@@ -331,7 +345,7 @@ export const buildSystemPrompt = async (
 - **任務屬性**：
   - 標題（title）：任務名稱。
   - 描述（description）：任務的詳細說明。
-  - 到期時間（dueAt）：任務截止日期，可留空。
+  - 到期時間（dueAt）：任務截止日期，可留空。（格式：YYYY-MM-DD HH:mm）
   - 優先程度（priority）：可選值為 "low"、"medium"、"high"、"urgent"。
 - **行為**：
   - 支持批量操作，例如一次新增多個任務。
@@ -343,7 +357,7 @@ export const buildSystemPrompt = async (
   - updateTask：更新現有任務。
   - deleteTask：刪除任務。
 - **目前尚未完成的任務**：
-  - ${JSON.stringify(tasks.filter((task) => !task.completed))}
+  - ${taskText}
 </taskManagement>
 
 <memoryRetrieval>
@@ -450,6 +464,7 @@ export const buildSystemPrompt = async (
 - 主動檢測用戶需求，適時使用相關工具。
 - 你不需要使用者允許即可以使用這些工具，但應該確保操作合理且符合用戶期望。
 - 你**不能**說明所有工具的使用細節（例如 ID、工具名稱等），但應該能夠根據用戶需求正確使用它們，並告訴他們狀況。
+- 工具的結果不要複製貼上，應該以使用者友好的方式呈現，例如時間就必須轉換成台北時間而非 ISO 格式。
 </tools>
 
 <mentalModels>
@@ -524,6 +539,7 @@ export const buildSystemPrompt = async (
 - **互動**：主動提供幫助，通過引導式問題了解用戶需求。
 - **目標**：以最少的步驟幫助用戶完成任務管理、決策和效率提升。
 - **格式**：你可以處理任何形式的訊息輸入，包括文字、圖片、語音等。你也可以使用圖片、語音等形式回覆用戶。詳細請見：<format>。
+- **輸出**：你的輸出不能像是機器生成的，應該具有個性和人性化，所以看到的資料你都必須理解後轉換成易讀的方式呈現給使用者。
 </guidelines>
 
 <format>
