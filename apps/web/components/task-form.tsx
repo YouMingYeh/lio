@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { TimePicker } from "@workspace/ui/components/time-picker";
 import { cn } from "@workspace/ui/lib/utils";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -58,6 +59,7 @@ export default function TaskForm({
   const [dueDate, setDueDate] = useState<Date | undefined>(
     initialData?.dueAt ? new Date(initialData.dueAt) : undefined,
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Focus the title input when the form opens
@@ -67,10 +69,11 @@ export default function TaskForm({
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
     if (!user) return;
+    setIsLoading(true);
 
     const task: Task = {
       userId: user.id,
@@ -83,11 +86,12 @@ export default function TaskForm({
       dueAt: dueDate?.toISOString() || null,
     };
     if (initialData) {
-      onUpdate(task.id, task);
+      await onUpdate(task.id, task);
     } else {
-      onInsert(task);
+      await onInsert(task);
     }
     onClose();
+    setIsLoading(false);
   };
 
   const overlayVariants = {
@@ -173,7 +177,7 @@ export default function TaskForm({
                   className="border-none bg-muted resize-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/50"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label
                     htmlFor="task-priority"
@@ -210,15 +214,21 @@ export default function TaskForm({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dueDate ? format(dueDate, "PPP") : "Pick a date"}
+                        {dueDate ? format(dueDate, "PPP p") : "Pick a date"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0 flex flex-col items-center justify-center">
                       <Calendar
                         mode="single"
                         selected={dueDate}
                         onSelect={setDueDate}
                         initialFocus
+                      />
+                      {/* Time Picker */}
+                      <TimePicker
+                        date={dueDate || new Date()}
+                        setDate={setDueDate}
+                        className="p-4 pt-2"
                       />
                     </PopoverContent>
                   </Popover>
@@ -238,6 +248,7 @@ export default function TaskForm({
                 type="submit"
                 disabled={!title.trim()}
                 className="rounded-full"
+                loading={isLoading}
               >
                 {initialData ? "Update" : "Create"} Task
               </Button>

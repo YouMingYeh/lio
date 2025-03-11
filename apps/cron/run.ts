@@ -170,6 +170,8 @@ function isOneTimeJobScheduleMatched(schedule: string): boolean {
     );
 
     // The job should run if the scheduled time matches the current time
+    console.log(`Scheduled time: ${normalizedScheduled}`);
+    console.log(`Current time: ${normalizedNow}`);
     const shouldRun = normalizedNow.getTime() === normalizedScheduled.getTime();
     return shouldRun;
   } catch (error) {
