@@ -186,10 +186,7 @@ export default function UsersList() {
                     >
                       <div className="flex w-full flex-wrap items-center gap-2">
                         <span className="font-medium">{user.displayName}</span>{" "}
-                        <span className="space-x-2">
-                          <span className="text-xs">{user.age}</span>
-                          <span className="text-xs">{user.gender}</span>
-                        </span>
+                        <span className="space-x-2"></span>
                       </div>
 
                       <div className="flex w-full flex-nowrap gap-2 overflow-auto">
@@ -214,8 +211,7 @@ export default function UsersList() {
                   <Separator orientation="vertical" className="mr-2 h-4" />
                   {activeUser && (
                     <div className="text-foreground line-clamp-1 font-medium">
-                      {activeUser.displayName} {activeUser.age}{" "}
-                      {activeUser.gender}
+                      {activeUser.displayName}
                     </div>
                   )}
                 </div>

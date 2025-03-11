@@ -34,8 +34,6 @@ export default function InformationSheet({ activeUser }: { activeUser: User }) {
         </Avatar>
         <div className="prose text-start">
           <Label>聯絡人基本資訊</Label>
-          {activeUser?.age && <p>年齡：{activeUser?.age}</p>}
-          {activeUser?.gender && <p>性別：{activeUser?.gender}</p>}
           {activeUser?.email && <p>電子郵件：{activeUser?.email}</p>}
         </div>
       </SheetContent>
