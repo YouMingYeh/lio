@@ -128,18 +128,10 @@ function isCronScheduleMatched(cronExpression: string): boolean {
 
 function isOneTimeJobScheduleMatched(schedule: string): boolean {
   try {
-    // Parse the schedule string (format: "2025-03-11 12:00")
+    // Parse the schedule string (format: "2025-03-11 12:00") (Taipei timezone)
     const [datePart, timePart] = schedule.split(" ");
     if (!datePart || !timePart) {
       console.error(`Invalid one-time schedule format: ${schedule}`);
-      return false;
-    }
-
-    // Create Date object for the scheduled time
-    const scheduledDate = new Date(`${datePart}T${timePart}:00+08:00`); // Taipei is UTC+8
-
-    if (isNaN(scheduledDate.getTime())) {
-      console.error(`Invalid date/time: ${schedule}`);
       return false;
     }
 
@@ -148,7 +140,16 @@ function isOneTimeJobScheduleMatched(schedule: string): boolean {
       new Date().toLocaleString("en-US", { timeZone: "Asia/Taipei" }),
     );
 
-    // Normalize both dates to minute precision for comparison (remove seconds)
+    // Method 1: Parse schedule without forcing timezone (cleaner approach)
+    // Create a Date object based on current date's timezone in Taipei
+    const scheduledDate = new Date(`${datePart}T${timePart}:00`);
+
+    if (isNaN(scheduledDate.getTime())) {
+      console.error(`Invalid date/time: ${schedule}`);
+      return false;
+    }
+
+    // Normalize both dates to minute precision for comparison
     const normalizedNow = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -169,9 +170,11 @@ function isOneTimeJobScheduleMatched(schedule: string): boolean {
       0,
     );
 
-    // The job should run if the scheduled time matches the current time
+    // Log the comparison for debugging
     console.log(`Scheduled time: ${normalizedScheduled}`);
     console.log(`Current time: ${normalizedNow}`);
+
+    // Compare timestamps
     const shouldRun = normalizedNow.getTime() === normalizedScheduled.getTime();
     return shouldRun;
   } catch (error) {
