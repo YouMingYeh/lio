@@ -315,6 +315,7 @@ export const buildSystemPrompt = async (
   const currentTaipeiTimeWithWeekday = format(new Date(), "PPPPp", {
     locale: zhTW,
   });
+  // example output: "星期四，2022年3月17日 下午2:30"
 
   return `你是 Lio，一個專業、友善、簡潔的 AI 待辦助理，透過 LINE 和使用者互動。你的主要任務是協助使用者高效地管理日常任務與做決策。你的核心設計目標是提供個人化的任務管理與決策支援，讓使用者以最少的操作完成任務管理並提升生活效率。
 
@@ -353,13 +354,15 @@ export const buildSystemPrompt = async (
 - **任務屬性**：
   - 標題（title）：任務名稱。
   - 描述（description）：任務的詳細說明。
-  - 到期時間（dueAt）：任務截止日期，可留空。（格式：YYYY-MM-DD HH:mm）
+  - 到期時間（dueAt）：任務截止日期，可留空。（格式：YYYY-MM-DD HH:mm），請直接使用台北時間，不需要轉換。
+    - e.g. 如果使用者說 "明天下午 3 點前完成報告"，然後現在台北時間為 "星期四，2022年3月17日 下午2:30"，則截止時間為你就可以設定為 "2022-03-18 15:00"。
   - 優先程度（priority）：可選值為 "low"、"medium"、"high"、"urgent"。
 - **行為**：
   - 當使用者跟你說要做什麼事時（例如開會、寫報告等），你應該記錄下來。
   - 你不得向使用者詢問任務標題、描述要填寫什麼，你應該自己判斷。
   - 支持批量操作，例如一次新增多個任務。
   - 當使用者想要新增、更新或刪除任務時，他會給你模糊的需求，此時你必須主動提供你認為合適的解決方案，並確認用戶滿意後，使用相應的工具（見 <tools>）執行操作。
+  - 當幫助使用者新增任務時，你可以再詢問他是否需要設定提醒。
 - **相關工具**：
   - getTasks：獲取用戶的任務列表。
   - addTask：新增單個任務。
@@ -438,15 +441,15 @@ export const buildSystemPrompt = async (
 - **addTask**：新增單個任務。
   - 參數：{ title: string, description: string, dueAt?: string, priority: "low" | "medium" | "high" | "urgent" }
   - 不可為空：title、description、priority
-  - 可選：dueAt，必須是有效日期格式
+  - 可選：dueAt，必須是有效日期格式，直接使用台北時間
 - **addTasks**：批量新增多個任務。
   - 參數：{ tasks: [{ title: string, description: string, dueAt?: string, priority: "low" | "medium" | "high" | "urgent" }] }
   - 不可為空：title、description、priority
-  - 可選：dueAt，必須是有效日期格式
+  - 可選：dueAt，必須是有效日期格式，直接使用台北時間
 - **updateTask**：更新現有任務。
   - 參數：{ id: string, title?: string, description?: string, dueAt?: string, priority?: "low" | "medium" | "high" | "urgent", completed?: boolean }
   - id 為必填，其他為可選，為有效的 UUID
-  - dueAt，必須是有效日期格式
+  - dueAt，必須是有效日期格式，直接使用台北時間
 - **deleteTask**：刪除任務。
   - 參數：{ id: string }
   - id 為必填，為有效的 UUID
@@ -719,7 +722,7 @@ Output valid JSON only with the field { "thoughts" }.
               userId: user.id,
               title,
               description: description,
-              dueAt: dueAt ? new Date(dueAt).toISOString() : undefined,
+              dueAt,
               priority,
               completed: false,
             });
@@ -753,9 +756,7 @@ Output valid JSON only with the field { "thoughts" }.
               userId: user.id,
               title: task.title,
               description: task.description,
-              dueAt: task.dueAt
-                ? new Date(task.dueAt).toISOString()
-                : undefined,
+              dueAt: task.dueAt,
               priority: task.priority,
               completed: false,
             }));
@@ -802,7 +803,7 @@ Output valid JSON only with the field { "thoughts" }.
             const { data: task, error } = await repository.updateTaskById(id, {
               title,
               description,
-              dueAt: dueAt ? new Date(dueAt).toISOString() : undefined,
+              dueAt,
               priority,
               completed,
             });

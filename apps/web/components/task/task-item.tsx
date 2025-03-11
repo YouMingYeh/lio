@@ -98,7 +98,7 @@ export default function TaskItem({
             </motion.h3>
           </div>
           <div className="text-sm text-muted-foreground whitespace-nowrap">
-            {format(new Date(task.createdAt), "PPP", { locale: zhTW })}
+            {format(task.createdAt, "PPP", { locale: zhTW })}
           </div>
         </div>
         {task.description && (
@@ -144,7 +144,9 @@ export default function TaskItem({
               >
                 <Clock className="h-3 w-3" />
                 <span>
-                  {format(new Date(task.dueAt), "PPP p", { locale: zhTW })}
+                  {format(new Date(task.dueAt), "PPP p", {
+                    locale: zhTW,
+                  })}
                 </span>
               </Badge>
             )}
