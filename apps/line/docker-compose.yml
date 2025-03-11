@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/youmingyeh/lio-line:latest
     ports:
-      - "5555:5555"
+      - "8888:8888"
     deploy:
       replicas: 2
       update_config:
