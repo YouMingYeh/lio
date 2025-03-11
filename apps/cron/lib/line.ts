@@ -4,7 +4,7 @@ type SendTextMessagePayload = {
 };
 
 export async function sendTextMessage(payload: SendTextMessagePayload) {
-  const url = "https://line.adastra.tw/send-text-message";
+  const url = "https://lio-line.adastra.tw/send-text-message";
 
   console.log(payload);
   const response = await fetch(url, {
@@ -36,7 +36,7 @@ type sendImageMessagePayload = {
 };
 
 export async function sendImageMessage(payload: sendImageMessagePayload) {
-  const url = "https://line.adastra.tw/send-image-message";
+  const url = "https://lio-line.adastra.tw/send-text-message";
 
   const response = await fetch(url, {
     method: "POST",

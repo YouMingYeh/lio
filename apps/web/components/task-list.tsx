@@ -73,7 +73,7 @@ export default function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <Alert variant="default" className="bg-muted/20 border-dashed">
+      <Alert variant="default" className="bg-muted border-dashed">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           No tasks yet. Click the &quot;New Task&quot; button to add one.

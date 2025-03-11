@@ -1,16 +1,22 @@
 "use client";
 
+import { JobList } from "./job-list";
 import TaskForm from "@/components/task-form";
 import TaskList from "@/components/task-list";
 import TaskStats from "@/components/task-stats";
 import { useUser } from "@/hooks/use-user";
+import {
+  deleteJobById,
+  getJobsByUserId,
+  updateJobById,
+} from "@/lib/data/job/action";
 import {
   createTask,
   deleteTaskById,
   getTasksByUserId,
   updateTaskById,
 } from "@/lib/data/task/action";
-import { Task, TaskInsert, TaskUpdate } from "@/types/database";
+import { Job, Task, TaskInsert, TaskUpdate } from "@/types/database";
 import { Button } from "@workspace/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
@@ -24,6 +30,7 @@ import {
   Sun,
   Moon,
   ArrowDownUp,
+  CirclePlay,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
@@ -34,10 +41,11 @@ type SortOption = "priority" | "dueDate" | "createdAt";
 export default function TaskDashboard() {
   const { user } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>("priority");
-  const [view, setView] = useState<"list" | "stats">("list");
+  const [view, setView] = useState<"list" | "stats" | "job">("list");
   const [incompleteFirst, setIncompleteFirst] = useState(true);
   const [customOrder, setCustomOrder] = useState<string[]>([]);
   const { theme, setTheme } = useTheme();
@@ -56,6 +64,22 @@ export default function TaskDashboard() {
       setTasks(data);
     };
     fetchTasks();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      if (!user) {
+        toast.error("Failed to fetch jobs");
+        return;
+      }
+      const { data } = await getJobsByUserId(user.id);
+      if (!data) {
+        toast.error("Failed to fetch jobs");
+        return;
+      }
+      setJobs(data);
+    };
+    fetchJobs();
   }, [user]);
 
   useEffect(() => {
@@ -144,6 +168,30 @@ export default function TaskDashboard() {
 
   const toggleIncompleteFirst = () => {
     setIncompleteFirst(!incompleteFirst);
+  };
+
+  const handleDeletJob = async (id: string) => {
+    const { error } = await deleteJobById(id);
+    if (error) {
+      toast.error("Failed to delete job");
+      return;
+    }
+    const updatedJobs = jobs.filter((job) => job.id !== id);
+    setJobs(updatedJobs);
+    toast.success("Job deleted");
+  };
+
+  const handlePauseJob = async (id: string) => {
+    const { data } = await updateJobById(id, {
+      status: "paused",
+    });
+    if (!data) {
+      toast.error("Failed to pause job");
+      return;
+    }
+    const updatedJobs = jobs.map((job) => (job.id === id ? data : job));
+    setJobs(updatedJobs);
+    toast.success("Job paused");
   };
 
   const sortTasks = (tasksToSort: Task[]): Task[] => {
@@ -254,15 +302,15 @@ export default function TaskDashboard() {
   const sortedTasks = sortTasks(tasks);
 
   return (
-    <div className="container max-w-3xl mx-auto space-y-6">
+    <div className=" max-w-3xl mx-auto space-y-6">
       <div className="flex flex-col gap-4">
         <Tabs
           defaultValue="list"
           value={view}
-          onValueChange={(v) => setView(v as "list" | "stats")}
+          onValueChange={(v) => setView(v as "list" | "stats" | "job")}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-2 ">
+          <TabsList className="grid w-full grid-cols-3 ">
             <TabsTrigger value="list" className="gap-1 ">
               <List className="h-4 w-4" />
               <span>List</span>
@@ -270,6 +318,10 @@ export default function TaskDashboard() {
             <TabsTrigger value="stats" className="gap-1 ">
               <BarChart2 className="h-4 w-4" />
               <span>Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="job" className="gap-1 ">
+              <CirclePlay className="h-4 w-4" />
+              <span>Job</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -350,7 +402,7 @@ export default function TaskDashboard() {
       </div>
 
       <AnimatePresence mode="wait">
-        {view === "list" ? (
+        {view === "list" && (
           <motion.div
             key="list"
             initial={{ opacity: 0, y: 20 }}
@@ -366,7 +418,8 @@ export default function TaskDashboard() {
               onReorder={handleReorderTasks}
             />
           </motion.div>
-        ) : (
+        )}
+        {view === "stats" && (
           <motion.div
             key="stats"
             initial={{ opacity: 0, y: 20 }}
@@ -375,6 +428,21 @@ export default function TaskDashboard() {
             transition={{ duration: 0.2 }}
           >
             <TaskStats tasks={tasks} />
+          </motion.div>
+        )}
+        {view === "job" && (
+          <motion.div
+            key="job"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <JobList
+              jobs={jobs}
+              onDelete={handleDeletJob}
+              onPause={handlePauseJob}
+            />
           </motion.div>
         )}
       </AnimatePresence>

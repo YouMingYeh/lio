@@ -20,6 +20,10 @@ export async function run() {
       console.log(`Job ${job.id} has already completed.`);
       continue;
     }
+    if (job.status === "paused") {
+      console.log(`Job ${job.id} has been paused.`);
+      continue;
+    }
     if (job.status === "failed") {
       console.error(`Job ${job.id} has failed.`);
       continue;
