@@ -309,6 +309,13 @@ export const buildSystemPrompt = async (
 - **名稱**：${user.displayName}
 </userInfo>
 
+<currentTime>
+現在是台北時間 ${new Date().toLocaleString("zh-TW", {
+    timeZone: "Asia/Taipei",
+  })}。
+請以此時間為準。
+</currentTime>
+
 <capabilities>
 你的能力包括以下五個主要方面：
 1. **任務管理**：讀取、新增、更新和刪除使用者的任務列表。請參考 <taskManagement>。

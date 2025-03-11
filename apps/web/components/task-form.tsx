@@ -102,7 +102,7 @@ export default function TaskForm({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
       style={{
         position: "fixed",
         top: 0,
@@ -140,7 +140,7 @@ export default function TaskForm({
                 <span className="sr-only">Close</span>
               </Button>
             </CardHeader>
-            <CardContent className="space-y-4 pt-2">
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="task-title"
