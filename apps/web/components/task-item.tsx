@@ -65,7 +65,7 @@ export default function TaskItem({
   return (
     <motion.div
       className={cn(
-        "group flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent/30 bg-card",
+        "group flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent/20 bg-card",
         task.completed ? "border-muted" : "border-border",
       )}
       whileHover={{ scale: 1.005 }}
@@ -83,7 +83,7 @@ export default function TaskItem({
         layout: { type: "spring", stiffness: 300, damping: 30 },
       }}
     >
-      <div className="flex items-center h-6 mt-0.5">
+      <div className="flex items-center h-6 ">
         <Checkbox
           checked={task.completed}
           onCheckedChange={handleToggleCompletion}
@@ -92,10 +92,10 @@ export default function TaskItem({
       </div>
       <div className="flex-1 space-y-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 mt-0.5">
             <motion.h3
               className={cn(
-                "font-medium leading-none transition-all duration-300",
+                "font-medium leading-5 transition-all duration-300 ",
                 task.completed && "text-muted-foreground",
               )}
               layout
@@ -134,8 +134,9 @@ export default function TaskItem({
               className={cn(
                 "flex items-center gap-1 text-xs px-2 py-1",
                 priorityColors[task.priority as keyof typeof priorityColors]
-                  .text,
-                priorityColors[task.priority as keyof typeof priorityColors].bg,
+                  ?.text,
+                priorityColors[task.priority as keyof typeof priorityColors]
+                  ?.bg,
                 "border-none",
               )}
             >
@@ -162,7 +163,7 @@ export default function TaskItem({
             )}
           </div>
 
-          <div className="flex items-center border rounded-full overflow-hidden">
+          <div className="flex items-center border rounded-full overflow-hidden bg-muted px-1">
             <Button
               variant="ghost"
               size="sm"

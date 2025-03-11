@@ -3,7 +3,14 @@
 import TaskForm from "@/components/task-form";
 import TaskList from "@/components/task-list";
 import TaskStats from "@/components/task-stats";
-import { Task } from "@/types/database";
+import { useUser } from "@/hooks/use-user";
+import {
+  createTask,
+  deleteTaskById,
+  getTasksByUserId,
+  updateTaskById,
+} from "@/lib/data/task/action";
+import { Task, TaskInsert, TaskUpdate } from "@/types/database";
 import { Button } from "@workspace/ui/components/button";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { cn } from "@workspace/ui/lib/utils";
@@ -25,6 +32,7 @@ import { toast } from "sonner";
 type SortOption = "priority" | "dueDate" | "createdAt";
 
 export default function TaskDashboard() {
+  const { user } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -35,15 +43,22 @@ export default function TaskDashboard() {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    // Load tasks from localStorage or use sample data
-    const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    } else {
-      const sampleTasks: Task[] = [];
-      setTasks(sampleTasks);
-    }
+    const fetchTasks = async () => {
+      if (!user) {
+        toast.error("Failed to fetch tasks");
+        return;
+      }
+      const { data } = await getTasksByUserId(user.id);
+      if (!data) {
+        toast.error("Failed to fetch tasks");
+        return;
+      }
+      setTasks(data);
+    };
+    fetchTasks();
+  }, [user]);
 
+  useEffect(() => {
     // Load custom order from localStorage
     const savedOrder = localStorage.getItem("tasksOrder");
     if (savedOrder) {
@@ -52,43 +67,44 @@ export default function TaskDashboard() {
   }, []);
 
   useEffect(() => {
-    // Save tasks to localStorage whenever they change
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
     // Save custom order to localStorage whenever it changes
     localStorage.setItem("tasksOrder", JSON.stringify(customOrder));
   }, [customOrder]);
 
-  const addTask = (task: Task) => {
-    const newTasks = [...tasks, task];
-    setTasks(newTasks);
-    // Add new task ID to the end of custom order
-    setCustomOrder((prev) => [...prev, task.id]);
+  const addTask = async (task: TaskInsert) => {
+    const { data } = await createTask(task);
+    if (!data) {
+      toast.error("Failed to add task");
+      return;
+    }
+    setTasks((prev) => [...prev, data]);
+    setCustomOrder((prev) => [...prev, data.id]);
     toast.success("Task added");
   };
 
-  const updateTask = (updatedTask: Task) => {
-    const oldTask = tasks.find((t) => t.id === updatedTask.id);
-    if (oldTask) {
-      const newTasks = tasks.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task,
-      );
-      setTasks(newTasks);
-      toast.success("Task updated");
+  const updateTask = async (id: string, updatedTask: TaskUpdate) => {
+    const { data } = await updateTaskById(id, updatedTask);
+    if (!data) {
+      toast.error("Failed to update task");
+      return;
     }
+    const updatedTasks = tasks.map((task) =>
+      task.id === updatedTask.id ? data : task,
+    );
+    setTasks(updatedTasks);
+    toast.success("Task updated");
   };
 
-  const deleteTask = (id: string) => {
-    const taskToDelete = tasks.find((t) => t.id === id);
-    if (taskToDelete) {
-      const newTasks = tasks.filter((task) => task.id !== id);
-      setTasks(newTasks);
-      // Remove task ID from custom order
-      setCustomOrder((prev) => prev.filter((taskId) => taskId !== id));
-      toast.success("Task deleted");
+  const deleteTask = async (id: string) => {
+    const { error } = await deleteTaskById(id);
+    if (error) {
+      toast.error("Failed to delete task");
+      return;
     }
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    setTasks(updatedTasks);
+    setCustomOrder((prev) => prev.filter((taskId) => taskId !== id));
+    toast.success("Task deleted");
   };
 
   const toggleTaskCompletion = (id: string) => {
@@ -366,7 +382,8 @@ export default function TaskDashboard() {
       <AnimatePresence>
         {isFormOpen && (
           <TaskForm
-            onSubmit={editingTask ? updateTask : addTask}
+            onUpdate={updateTask}
+            onInsert={addTask}
             onClose={handleFormClose}
             initialData={editingTask}
           />

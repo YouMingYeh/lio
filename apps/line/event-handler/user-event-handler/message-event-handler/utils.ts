@@ -405,15 +405,25 @@ export const buildSystemPrompt = async (
 - **getTasks**：獲取用戶的任務列表。
   - 參數：無
 - **addTask**：新增單個任務。
-  - 參數：{ title: string, description: string, dueAt: string, priority?: "low" | "medium" | "high" | "urgent" }
+  - 參數：{ title: string, description: string, dueAt?: string, priority: "low" | "medium" | "high" | "urgent" }
+  - 不可為空：title、description、priority
+  - 可選：dueAt，必須是有效日期格式
 - **addTasks**：批量新增多個任務。
-  - 參數：{ tasks: [{ title: string, description: string, dueAt?: string, priority?: "low" | "medium" | "high" | "urgent" }] }
+  - 參數：{ tasks: [{ title: string, description: string, dueAt?: string, priority: "low" | "medium" | "high" | "urgent" }] }
+  - 不可為空：title、description、priority
+  - 可選：dueAt，必須是有效日期格式
 - **updateTask**：更新現有任務。
   - 參數：{ id: string, title?: string, description?: string, dueAt?: string, priority?: "low" | "medium" | "high" | "urgent", completed?: boolean }
+  - id 為必填，其他為可選，為有效的 UUID
+  - dueAt，必須是有效日期格式
 - **deleteTask**：刪除任務。
   - 參數：{ id: string }
+  - id 為必填，為有效的 UUID
 - **scheduleJob**：設定提醒任務。
   - 參數：{ name: string, schedule: string, type: "one-time" | "cron", message: string }
+  - schedule 為 cron 表達式或具體時間，最小單位為五分鐘
+  - type 為 "one-time" 或 "cron"，代表單次提醒或定期提醒
+  - 皆不可為空
 - **removeJob**：移除提醒任務。
   - 參數：{ id: string }
 - **getJobs**：獲取用戶的提醒列表。
@@ -422,6 +432,7 @@ export const buildSystemPrompt = async (
   - 參數：{ content: string }
 - **retrieveMemories**：檢索記憶。
   - 參數：{ query?: string }
+  - query 為可選，用於檢索特定記憶
 - **deleteMemory**：刪除記憶。
   - 參數：{ id: string }
 - **userFeedback**：記錄用戶反饋。
@@ -481,14 +492,20 @@ export const buildSystemPrompt = async (
 28. **奧卡姆剃刀**：當有多種解釋時，選擇最簡單的那一種。應用：減少不必要的假設。
 29. **思維慣性**：我們容易根據過去經驗做決策。應用：跳脫傳統思維框架。
 
+### 溝通與影響力
+30. **漢堡模型**：正面、負面、正面結構的溝通方式。應用：清晰表達觀點和建議。
+31. **情境認知理論**：人們根據情境和環境進行溝通。應用：理解溝通背後的動機和目的。
+32. **說故事技巧**：通過故事傳達信息和價值觀。應用：提高信息吸引力和記憶度。
+33. **情感勸說**：通過情感和情感連結影響他人。應用：提高溝通效果和影響力。
+
 ### 其他模型
-30. **第一性原理**：從最基本的假設出發進行推理。應用：找到創新解決方案。
-31. **逆向思維**：從相反的角度思考問題。應用：發現隱藏的機會和風險。
-32. **破窗效應**：環境中的小問題若不解決，可能導致更嚴重問題。應用：維護企業文化與紀律。
-33. **長尾理論**：少數熱門產品之外，冷門產品也能產生大量需求。應用：擴展市場機會。
+34. **第一性原理**：從最基本的假設出發進行推理。應用：找到創新解決方案。
+35. **逆向思維**：從相反的角度思考問題。應用：發現隱藏的機會和風險。
+36. **破窗效應**：環境中的小問題若不解決，可能導致更嚴重問題。應用：維護企業文化與紀律。
+37. **長尾理論**：少數熱門產品之外，冷門產品也能產生大量需求。應用：擴展市場機會。
 
 **應用方式**：
-1. 根據用戶的具體問題，選擇一個或多個模型。
+1. 根據用戶的具體問題，選擇**一個**最適當的心智模型。
 2. 搜尋網路對於模型的解釋和案例，以便更好地應用。
 3. 直接使用模型幫助用戶思考，幫助他們做出更明智的決策。
 4. 提供清晰的解釋和建議，以幫助用戶理解和接受你的建議。
@@ -643,10 +660,12 @@ Output valid JSON only with the field { "thoughts" }.
             description: z
               .string()
               .describe("The description of the new task."),
-            dueAt: z.string().describe("The due date of the new task."),
+            dueAt: z
+              .string()
+              .optional()
+              .describe("The due date of the new task."),
             priority: z
               .enum(["low", "medium", "high", "urgent"])
-              .optional()
               .describe("The priority of the new task."),
           }),
           execute: async ({ title, description, dueAt, priority }) => {
@@ -654,7 +673,7 @@ Output valid JSON only with the field { "thoughts" }.
               userId: user.id,
               title,
               description: description,
-              dueAt: new Date(dueAt).toISOString(),
+              dueAt: dueAt ? new Date(dueAt).toISOString() : undefined,
               priority,
               completed: false,
             });
@@ -679,7 +698,6 @@ Output valid JSON only with the field { "thoughts" }.
                   .describe("The due date of the new task if any."),
                 priority: z
                   .enum(["low", "medium", "high", "urgent"])
-                  .optional()
                   .describe("The priority of the new task."),
               }),
             ),

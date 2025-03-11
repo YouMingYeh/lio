@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/hooks/use-user";
-import { Task } from "@/types/database";
+import { Task, TaskInsert, TaskUpdate } from "@/types/database";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -35,13 +35,15 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface TaskFormProps {
-  onSubmit: (task: Task) => void;
+  onUpdate: (id: string, task: TaskUpdate) => Promise<void>;
+  onInsert: (task: TaskInsert) => Promise<void>;
   onClose: () => void;
   initialData?: Task | null;
 }
 
 export default function TaskForm({
-  onSubmit,
+  onUpdate,
+  onInsert,
   onClose,
   initialData,
 }: TaskFormProps) {
@@ -51,7 +53,7 @@ export default function TaskForm({
     initialData?.description || "",
   );
   const [priority, setPriority] = useState<string>(
-    initialData?.priority.toString() || "2",
+    initialData?.priority.toString() || "medium",
   );
   const [dueDate, setDueDate] = useState<Date | undefined>(
     initialData?.dueAt ? new Date(initialData.dueAt) : undefined,
@@ -80,8 +82,10 @@ export default function TaskForm({
       createdAt: initialData?.createdAt || new Date().toISOString(),
       dueAt: dueDate?.toISOString() || null,
     };
-
-    onSubmit(task);
+    if (initialData) {
+      onUpdate(task.id, task);
+    }
+    onInsert(task);
     onClose();
   };
 
@@ -98,6 +102,14 @@ export default function TaskForm({
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        margin: 0,
+      }}
       initial="hidden"
       animate="visible"
       exit="hidden"
@@ -176,10 +188,10 @@ export default function TaskForm({
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Low</SelectItem>
-                      <SelectItem value="2">Medium</SelectItem>
-                      <SelectItem value="3">High</SelectItem>
-                      <SelectItem value="4">Urgent</SelectItem>
+                      <SelectItem value="low">🟢 Low</SelectItem>
+                      <SelectItem value="medium">🔵 Medium</SelectItem>
+                      <SelectItem value="high">🟡 High</SelectItem>
+                      <SelectItem value="urgent">🔴 Urgent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -215,7 +227,7 @@ export default function TaskForm({
             <CardFooter className="flex justify-between pt-2">
               <Button
                 type="button"
-                variant="ghost"
+                variant="secondary"
                 onClick={onClose}
                 className="rounded-full"
               >
