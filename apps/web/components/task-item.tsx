@@ -1,6 +1,6 @@
 "use client";
 
-import type { Task } from "@/lib/types";
+import { Task } from "@/types/database";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
@@ -45,17 +45,17 @@ export default function TaskItem({
   }, []);
 
   const priorityColors = {
-    1: { text: "text-green-600", bg: "bg-green-100 dark:bg-green-950" },
-    2: { text: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-950" },
-    3: { text: "text-yellow-600", bg: "bg-yellow-100 dark:bg-yellow-950" },
-    4: { text: "text-red-600", bg: "bg-red-100 dark:bg-red-950" },
+    low: { text: "text-green-600", bg: "bg-green-100 dark:bg-green-950" },
+    medium: { text: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-950" },
+    high: { text: "text-yellow-600", bg: "bg-yellow-100 dark:bg-yellow-950" },
+    urgent: { text: "text-red-600", bg: "bg-red-100 dark:bg-red-950" },
   };
 
   const priorityLabels = {
-    1: "Low",
-    2: "Medium",
-    3: "High",
-    4: "Urgent",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+    urgent: "Urgent",
   };
 
   const handleToggleCompletion = () => {
@@ -145,19 +145,19 @@ export default function TaskItem({
               </span>
             </Badge>
 
-            {task.dueDate && (
+            {task.dueAt && (
               <Badge
                 variant="outline"
                 className={cn(
                   "flex items-center gap-1 text-xs px-2 py-1",
-                  new Date(task.dueDate) < new Date() && !task.completed
+                  new Date(task.dueAt) < new Date() && !task.completed
                     ? "text-destructive bg-destructive/10"
                     : "text-muted-foreground bg-muted",
                   "border-none",
                 )}
               >
                 <Clock className="h-3 w-3" />
-                <span>{format(new Date(task.dueDate), "MMM d")}</span>
+                <span>{format(new Date(task.dueAt), "MMM d")}</span>
               </Badge>
             )}
           </div>
