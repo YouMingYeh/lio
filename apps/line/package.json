@@ -1,0 +1,42 @@
+{
+  "name": "lio-line",
+  "version": "0.0.0",
+  "description": "lio-line",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "tsc && tsc-alias",
+    "build-sdk": "cd ../../; npm i; npm run build",
+    "start": "node dist/index.js",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^1.1.17",
+    "@ai-sdk/openai": "^1.1.15",
+    "@langchain/community": "^0.3.33",
+    "@langchain/core": "^0.3.42",
+    "@line/bot-sdk": "^9.7.1",
+    "@supabase/supabase-js": "^2.49.1",
+    "ai": "^4.1.47",
+    "dotenv": "^16.4.7",
+    "elevenlabs": "^1.53.0",
+    "express": "^4.21.2",
+    "file-type": "^20.4.0",
+    "gpt-tokenizer": "^2.8.1",
+    "openai": "^4.86.1",
+    "playwright": "^1.50.1",
+    "youtubei.js": "^13.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.17.22",
+    "@types/react": "18.3.0",
+    "rimraf": "^5.0.10",
+    "tsc-alias": "^1.8.11",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

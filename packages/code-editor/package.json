@@ -1,0 +1,29 @@
+{
+  "name": "@workspace/code-editor",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@monaco-editor/react": "4.7.0-rc.0",
+    "@workspace/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@turbo/gen": "^2.3.4",
+    "@types/node": "^22.12.0",
+    "@types/react": "18.3.0",
+    "@types/react-dom": "18.3.1",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "react": "^18.3.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

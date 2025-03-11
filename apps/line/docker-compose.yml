@@ -1,0 +1,19 @@
+services:
+  line-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/youmingyeh/lio-line:latest
+    ports:
+      - "5555:5555"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 30s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: overlay
