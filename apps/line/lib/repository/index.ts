@@ -3,6 +3,8 @@ import { Database, TablesInsert, TablesUpdate } from "@/database.types.js";
 import {
   camelToSnakeCase,
   FeedbackInsert,
+  JobInsert,
+  JobUpdate,
   MemoryInsert,
   MemoryUpdate,
   MessageInsert,
@@ -141,6 +143,19 @@ class Repository {
     return { data: snakeToCamelCase(data), error: null };
   }
 
+  async deleteTaskById(id: string) {
+    const { data, error } = await this.supabase
+      .from("task")
+      .delete()
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) {
+      return { data: null, error };
+    }
+    return { data, error: null };
+  }
+
   async updateTaskById(id: string, task: TaskUpdate) {
     const { data, error } = await this.supabase
       .from("task")
@@ -152,6 +167,66 @@ class Repository {
       return { data: null, error };
     }
     return { data: snakeToCamelCase(data), error: null };
+  }
+
+  async getJobsByUserId(userId: string) {
+    const { data, error } = await this.supabase
+      .from("job")
+      .select("*")
+      .eq("user_id", userId);
+    if (error) {
+      return { data: null, error };
+    }
+    return { data: snakeToCamelCase(data), error: null };
+  }
+
+  async getJobById(id: string) {
+    const { data, error } = await this.supabase
+      .from("job")
+      .select("*")
+      .eq("id", id)
+      .single();
+    if (error) {
+      return { data: null, error };
+    }
+    return { data: snakeToCamelCase(data), error: null };
+  }
+
+  async createJob(job: JobInsert) {
+    const { data, error } = await this.supabase
+      .from("job")
+      .insert(camelToSnakeCase(job))
+      .select()
+      .single();
+    if (error) {
+      return { data: null, error };
+    }
+    return { data: snakeToCamelCase(data), error: null };
+  }
+
+  async updateJobById(id: string, job: JobUpdate) {
+    const { data, error } = await this.supabase
+      .from("job")
+      .update(camelToSnakeCase(job))
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) {
+      return { data: null, error };
+    }
+    return { data: snakeToCamelCase(data), error: null };
+  }
+  async deleteJobById(id: string) {
+    const { data, error } = await this.supabase
+      .from("job")
+      .delete()
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) {
+      return { data: null, error };
+    }
+    return { data, error: null };
   }
 
   async getMemoriesByUserId(userId: string) {

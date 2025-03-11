@@ -38,7 +38,7 @@ export const FooterSection = () => {
             <h3 className="text-lg font-bold">幫助</h3>
             <div>
               <Link
-                href="https://lin.ee/MTtKauR"
+                href="https://line.me/R/ti/p/@752pcsxu"
                 className="opacity-60 hover:opacity-100"
               >
                 問題回報或回饋意見？請直接與我們的官方帳號聯繫！

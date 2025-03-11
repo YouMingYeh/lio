@@ -42,6 +42,7 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          name: string;
           parameters: Json | null;
           schedule: string;
           status: string;
@@ -51,6 +52,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           id?: string;
+          name: string;
           parameters?: Json | null;
           schedule: string;
           status?: string;
@@ -60,6 +62,7 @@ export type Database = {
         Update: {
           created_at?: string;
           id?: string;
+          name?: string;
           parameters?: Json | null;
           schedule?: string;
           status?: string;
@@ -142,7 +145,7 @@ export type Database = {
           completed: boolean;
           created_at: string;
           description: string;
-          due_at: string;
+          due_at: string | null;
           id: string;
           priority: string;
           title: string;
@@ -152,7 +155,7 @@ export type Database = {
           completed?: boolean;
           created_at?: string;
           description: string;
-          due_at: string;
+          due_at?: string | null;
           id?: string;
           priority?: string;
           title: string;
@@ -162,7 +165,7 @@ export type Database = {
           completed?: boolean;
           created_at?: string;
           description?: string;
-          due_at?: string;
+          due_at?: string | null;
           id?: string;
           priority?: string;
           title?: string;

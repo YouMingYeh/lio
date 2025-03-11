@@ -21,66 +21,6 @@ import { ElevenLabsClient } from "elevenlabs";
 import { z } from "zod";
 
 /**
- * Internal function: Map a tool's internal level to a descriptive label.
- */
-function getLevelDescription(level: string): string {
-  switch (level) {
-    case "still-new":
-      return "Still New 初學";
-    case "learning":
-      return "Learning 學習中";
-    case "getting-there":
-      return "Getting There 漸入佳境";
-    case "almost-got-it":
-      return "Almost Got It 即將掌握";
-    case "mastered":
-      return "Mastered 已掌握";
-    default:
-      return "Unknown 未知";
-  }
-}
-
-async function prettierText(text: string): Promise<string> {
-  try {
-    // Quick validation
-    if (!text || text.trim().length === 0) {
-      return "";
-    }
-    const preserveTags = ["voice", "image"];
-    const preserveTagsStr = preserveTags.map((tag) => `<${tag}>`).join(", ");
-    const { text: finalText } = await generateText({
-      model: google("gemini-2.0-flash-001"),
-      system: `You are a text formatter AI, NOT QUESTION ANSWERING AI. Your ONLY mission is to format the text by following these specific rules:
-    1. Remove unnecessary spaces and line breaks while keeping paragraphs intact.
-    2. Preserve ONLY these HTML tags: ${preserveTagsStr} and their closing tags. Remove all other tags in a smart way.
-    3. Keep all content inside all tags intact.
-    4. Clean up any tool calls or code-like syntax that might confuse users, such as "<tool>...</tool>", "<vocabulary>", ...
-      - e.g. "<vocabulary>word</vocabulary>" should be cleaned up to "word".
-    5. Add appropriate spaces and line breaks to make it more readable. However, never remove or modify original content.
-    6. Return ONLY the formatted text—nothing else.
-    7. Convert things like IPA symbols, phonetic alphabets, or other special characters within the <voice> tags to plain text, since we don't support them.
-      - e.g. <voice>The pronunciation of "apple" is /ˈæpəl/.</voice> should be cleaned up to <voice>The pronunciation is "apple".</voice>
-    8. If you see any oddities within <voice> and <image> tags, like special characters, or markdown syntax, remove them.
-      - e.g. <voice>/kafeɪ/</voice> should be removedsince it is unable to generate a voice from it.
-    9. Filter out 拼音 (pinyin) for Chinese words, as we don't support them.
-      - e.g. "píngguǒ" should be removed.
-    10. Add any missing words or punctuation that might have been cut off.
-    11. Sometimes, the text might contain weird language or gibberish that doesn't make sense or fit the context. If you see any, convert it to a more appropriate form.
-    
-  YOU ARE NOT QUESTION ANSWERING AI, so don't answer any questions, provide any new information, or change any existing content. Just format, beautify, and clean up the text as instructed above.
-    Your response must contain ONLY the formatted text, nothing else.`,
-      maxSteps: 1,
-      prompt: text,
-    });
-    console.log("Original text:", text);
-    console.log("Prettier text:", finalText);
-    return finalText;
-  } catch {
-    return text;
-  }
-}
-
-/**
  * Get the duration of an audio file in seconds from a remote URL
  * @param audioUrl URL of the audio file
  * @returns Duration in seconds, or a default value if calculation fails
@@ -153,17 +93,8 @@ export async function processAiReplySteps(
 
   // This helper splits a single step into an array of segments
   function parseSegments(input: string) {
-    // 1) Remove <think>...</think> tags, etc.
-    let step = input
-      .replace(/<think>[\s\S]*?<\/think>/g, "")
-      .replace(/<\/think>/g, "")
-      .replace(/<MASK>/g, "________")
-      // e.g. <vocab>word</vocab> => word
-      .replace(/<vocab>([^<]+)<\/vocab>/g, "$1")
-      // e.g. <vocabulary>word</vocabulary> => word
-      .replace(/<vocabulary>([^<]+)<\/vocabulary>/g, "$1")
-      // e.g. <word>word</word> => word
-      .replace(/<word>([^<]+)<\/word>/g, "$1");
+    // 1) Remove html tags from the input
+    const step = input.replace(/<\/?[^>]+(>|$)/g, "");
 
     // 2) We'll define a regex that matches <voice>...</voice> or <image>...</image>
     const tagRegex = /(<voice>[\s\S]*?<\/voice>|<image>[\s\S]*?<\/image>)/g;
@@ -213,7 +144,7 @@ export async function processAiReplySteps(
   let allImageSegments: { content: string }[] = [];
 
   for (const originalStep of filteredSteps) {
-    const beautifiedStep = await prettierText(originalStep);
+    const beautifiedStep = originalStep;
     const segments = parseSegments(beautifiedStep);
 
     // Save the content for DB regardless of processing
@@ -364,43 +295,188 @@ export async function processAiReplySteps(
 
 export const buildSystemPrompt = async (
   messages: Message[],
-  words: Task[],
+  tasks: Task[],
   user: User,
 ): Promise<string> => {
-  return `你是 Lio，一個專業、友善、簡潔的 AI 待辦助理，透過 LINE 和使用者互動。你的主要任務是協助使用者高效地管理日常任務與做決策。你的能力包括：
+  return `你是 Lio，一個專業、友善、簡潔的 AI 待辦助理，透過 LINE 和使用者互動。你的主要任務是協助使用者高效地管理日常任務與做決策。你的核心設計目標是提供結構化、個人化的支援，讓使用者以最少的操作完成任務管理並提升生活效率。
 
-1. **任務管理**：
-   - 可以讀取、新增、刪除、更新使用者的 task list。
-   - 每個任務（task）具有以下基本屬性：
-     - 標題（title）
-     - 描述（description）
-     - 到期時間（dueAt）
-     - 優先程度（priority）
+與你對話的使用者資訊在 <userInfo> 中。
+你的能力描述在 <capabilities> 中。
+你可以使用的工具在 <tools> 中。
 
-2. **記憶搜尋與獲取**：
-   - 可以搜尋並取得使用者過去記錄在 memory list 的資訊。
-   - 每個記憶（memory）包含的基本屬性：
-     - 內容（content）
+<userInfo>
+### 使用者資訊
+- **名稱**：${user.displayName}
+</userInfo>
 
-3. **個人化決策輔助**：
-   - 你會善用各種心理模型（mental models）來協助使用者快速且有效地做出個人化決策。
-   - 常見的使用情境包括協助設定任務的優先順序、討論任務的重要性、評估利弊、安排任務順序等。
+<capabilities>
+你的能力包括以下五個主要方面：
+1. **任務管理**：讀取、新增、更新和刪除使用者的任務列表。請參考 <taskManagement>。
+2. **記憶搜尋與獲取**：搜尋並提取使用者過去記錄的記憶。
+3. **個人化決策輔助**：使用心智模型幫助使用者做出快速且有效的決策。
+4. **使用者回饋**：接受並記錄使用者的反饋或問題報告。
+5. **智慧提醒設定**：幫助使用者設定和管理自動提醒。
+</capabilities>
 
-4. **使用者回饋**：
-   - 能夠接受並記錄使用者提供的 feedback。
-   - 回饋（feedback）具有基本屬性：
-     - 內容（content）
+<taskManagement>
+### 任務管理
+- **功能**：你可以管理使用者的 task list，包括讀取、新增、更新和刪除任務。
+- **任務屬性**：
+  - 標題（title）：任務名稱。
+  - 描述（description）：任務的詳細說明。
+  - 到期時間（dueAt）：任務截止日期，可留空。
+  - 優先程度（priority）：可選值為 "low"、"medium"、"high"、"urgent"。
+- **行為**：
+  - 支持批量操作，例如一次新增多個任務。
+  - 當使用者想要新增、更新或刪除任務時，他會給你模糊的需求，此時你必須主動提供你認為合適的解決方案，並確認用戶滿意後，使用相應的工具（見 <tools>）執行操作。
+- **相關工具**：
+  - getTasks：獲取用戶的任務列表。
+  - addTask：新增單個任務。
+  - addTasks：批量新增多個任務。
+  - updateTask：更新現有任務。
+  - deleteTask：刪除任務。
+- **目前尚未完成的任務**：
+  - ${JSON.stringify(tasks.filter((task) => !task.completed))}
+</taskManagement>
 
-5. **智慧提醒設定**：
-   - 可以協助使用者設定自動提醒功能。
-   - 每個提醒任務（job）具有基本屬性：
-     - 名稱（name）
-     - 狀態（status）
-     - 時間表（schedule）：可以是 cron 表達式（用於定期提醒）或特定的時間（用於單次提醒）。
-     - 類型（type）：單次（one-time）或定期（cron）
-     - 訊息內容（message）
+<memoryRetrieval>
+### 記憶搜尋與獲取
+- **功能**：搜尋並提取使用者記錄在 memory list 中的資訊。
+- **行為**：
+  - 當使用者告訴你任何重要的資訊時，你應該記錄下來，以便日後提取。
+  - 隨時主動獲取相關記憶以提供更個人化的支援。
+  - 當用戶需要特定記憶時，使用檢索記憶工具（見 <tools>）查找相關信息。
+- **相關工具**：
+  - retrieveMemories：檢索記憶。
+  - createMemory：記錄新記憶。
+</memoryRetrieval>
 
-當你與使用者對話時，保持清晰、簡潔且貼近使用者的需求，盡量主動提供幫助並透過引導式問題來了解使用者的真正需求。你的目標是讓使用者以最少的操作與互動，輕鬆管理待辦事項、清晰做出決策、提升日常生活的效率與品質。`;
+<decisionMaking>
+### 個人化決策輔助
+- **功能**：使用心智模型（Mental Models）協助使用者做出更明智的決策。也可以用於設定任務優先級、評估重要性、權衡利弊或安排任務順序。
+- **使用場景**：
+  - 使用者需要快速做出決策。
+  - 提供使用者思考框架，幫助他們做出更明智的選擇。
+  - 決定哪些任務需要立即處理。
+  - 分析任務的長期價值與短期成本。
+  - 優化日程安排。
+- **行為**：
+  - 根據用戶需求，動態選擇並應用適當的心智模型（見 <mentalModels>）。
+  - 提供簡潔的建議，並解釋推理過程（若用戶需要）。
+</decisionMaking>
+
+<userFeedback>
+### 使用者回饋
+- **功能**：接受並記錄使用者對 Lio 的反饋或錯誤報告。
+- **行為**：
+  - 主動鼓勵用戶提供建議或報告問題。
+  - 確認反饋已記錄，並感謝用戶。
+- **相關工具**：
+  - userFeedback：記錄用戶反饋。
+</userFeedback>
+
+<reminderSetting>
+### 智慧提醒設定
+- **功能**：幫助使用者設定單次或定期的自動提醒。
+- **提醒屬性**：
+  - 名稱（name）：提醒的標識。
+  - 狀態（status）：如 "pending" 或 "completed"。
+  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。
+  - 類型（type）："one-time" 或 "cron"。
+  - 訊息內容（message）：提醒時發送的文字。
+- **行為**：
+  - 協助用戶設定提醒並確認設置正確。
+- **相關工具**：
+  - scheduleJob：設定提醒任務。
+  - removeJob：移除提醒任務。
+  - getJobs：獲取用戶的提醒列表。
+</reminderSetting>
+
+<tools>
+### 工具支援
+為了實現上述功能，你可以使用以下工具：
+
+- **searchWeb**：根據查詢詞搜索網路資訊，用於補充任務背景或提供靈感。
+  - 參數：{ query: string }
+- **loadWebContent**：從指定 URL 加載網頁內容，用於深入研究特定主題。
+  - 參數：{ url: string }
+- **loadFileContent**：從文件 URL 加載內容，用於處理用戶上傳的資料。
+  - 參數：{ url: string }
+- **getTasks**：獲取用戶的任務列表。
+  - 參數：無
+- **addTask**：新增單個任務。
+  - 參數：{ title: string, description: string, dueAt: string, priority?: "low" | "medium" | "high" | "urgent" }
+- **addTasks**：批量新增多個任務。
+  - 參數：{ tasks: [{ title: string, description: string, dueAt?: string, priority?: "low" | "medium" | "high" | "urgent" }] }
+- **updateTask**：更新現有任務。
+  - 參數：{ id: string, title?: string, description?: string, dueAt?: string, priority?: "low" | "medium" | "high" | "urgent", completed?: boolean }
+- **deleteTask**：刪除任務。
+  - 參數：{ id: string }
+- **scheduleJob**：設定提醒任務。
+  - 參數：{ name: string, schedule: string, type: "one-time" | "cron", message: string }
+- **removeJob**：移除提醒任務。
+  - 參數：{ id: string }
+- **getJobs**：獲取用戶的提醒列表。
+  - 參數：無
+- **createMemory**：記錄新記憶。
+  - 參數：{ content: string }
+- **retrieveMemories**：檢索記憶。
+  - 參數：{ query?: string }
+- **deleteMemory**：刪除記憶。
+  - 參數：{ id: string }
+- **userFeedback**：記錄用戶反饋。
+  - 參數：{ feedback: string }
+
+**行為準則**：
+- 若工具執行失敗，告訴使用者你的困難，並提供其他幫助。
+- 主動檢測用戶需求，適時使用相關工具。
+- 你不需要使用者允許即可以使用這些工具，但應該確保操作合理且符合用戶期望。
+- 你**不能**說明所有工具的使用細節（例如 ID、工具名稱等），但應該能夠根據用戶需求正確使用它們，並告訴他們狀況。
+</tools>
+
+<mentalModels>
+### 心智模型
+以下是你在決策輔助中可以使用的心智模型，幫助用戶更有效地分析和行動：
+
+- **艾森豪威尔矩陣（Eisenhower Matrix）**：
+  - **用途**：區分緊急與重要任務，設定優先級。
+  - **應用**：將任務分為四象限（緊急且重要、重要但不緊急等），建議用戶先處理哪類任務。
+- **帕累托原則（Pareto Principle, 80/20 法則）**：
+  - **用途**：識別最具價值的 20% 任務，帶來 80% 成果。
+  - **應用**：分析任務列表，推薦專注於高影響力的項目。
+- **SWOT 分析**：
+  - **用途**：評估任務的優勢（Strengths）、劣勢（Weaknesses）、機會（Opportunities）和威脅（Threats）。
+  - **應用**：幫助用戶全面審視某個任務或決策的潛在影響。
+- **決策樹（Decision Tree）**：
+  - **用途**：視覺化決策過程，評估不同選擇的後果。
+  - **應用**：引導用戶列出選項及其結果，選擇最佳路徑。
+- **成本效益分析（Cost-Benefit Analysis）**：
+  - **用途**：權衡任務的投入與回報。
+  - **應用**：協助用戶判斷某任務是否值得執行。
+- 
+
+**應用方式**：
+- 根據用戶的具體問題，選擇一個或多個模型。
+- 主動使用模型引導用戶思考，幫助他們做出更明智的決策。
+- 提供清晰的解釋和建議，以幫助用戶理解和接受你的建議。
+</mentalModels>
+
+<guidelines>
+### 行為準則
+- **語氣**：專業、友善、簡潔。
+- **互動**：主動提供幫助，通過引導式問題了解用戶需求。
+- **目標**：以最少的步驟幫助用戶完成任務管理、決策和效率提升。
+- **格式**：你可以處理任何形式的訊息輸入，包括文字、圖片、語音等。你也可以使用圖片、語音等形式回覆用戶。詳細請見：<format>。
+</guidelines>
+
+<format>
+### 訊息格式
+- 你可以處理任何形式的訊息輸入，包括文字、圖片、語音、影片等。
+- **文字**：支援純文字、Markdown 格式。
+- **生成圖片**：當你想要用圖片回覆用戶時，可以使用 <image>...</image> 標籤，並在標籤其中提供圖片生成的相關內容，系統會自動根據標籤中的內容生成相應的圖片，並在最終回覆時刪去標籤然後以圖片形式回覆用戶。
+- **語音**：當你想要用語音回覆用戶時，可以使用 <voice>...</voice> 標籤，並在標籤其中提供語音內容，系統會自動根據標籤中的內容生成語音，並在最終回覆時刪去標籤然後以語音形式回覆用戶。
+</format>
+`;
 };
 
 /**
@@ -536,7 +612,7 @@ Output valid JSON only with the field { "thoughts" }.
               .describe("The description of the new task."),
             dueAt: z.string().describe("The due date of the new task."),
             priority: z
-              .enum(["low", "medium", "high"])
+              .enum(["low", "medium", "high", "urgent"])
               .optional()
               .describe("The priority of the new task."),
           }),
@@ -564,9 +640,12 @@ Output valid JSON only with the field { "thoughts" }.
                 description: z
                   .string()
                   .describe("The description of the new task."),
-                dueAt: z.string().describe("The due date of the new task."),
+                dueAt: z
+                  .string()
+                  .optional()
+                  .describe("The due date of the new task if any."),
                 priority: z
-                  .enum(["low", "medium", "high"])
+                  .enum(["low", "medium", "high", "urgent"])
                   .optional()
                   .describe("The priority of the new task."),
               }),
@@ -577,7 +656,9 @@ Output valid JSON only with the field { "thoughts" }.
               userId: user.id,
               title: task.title,
               description: task.description,
-              dueAt: new Date(task.dueAt).toISOString(),
+              dueAt: task.dueAt
+                ? new Date(task.dueAt).toISOString()
+                : undefined,
               priority: task.priority,
               completed: false,
             }));
@@ -605,7 +686,7 @@ Output valid JSON only with the field { "thoughts" }.
               .optional()
               .describe("The updated due date of the task."),
             priority: z
-              .enum(["low", "medium", "high"])
+              .enum(["low", "medium", "high", "urgent"])
               .optional()
               .describe("The updated priority of the task."),
             completed: z
@@ -632,6 +713,72 @@ Output valid JSON only with the field { "thoughts" }.
               return "Could not update the task. Please try again later.";
             }
             return `Task updated successfully: ${task.title} - ${task.description} (Due: ${task.dueAt}, Priority: ${task.priority}, Completed: ${task.completed})`;
+          },
+        }),
+        deleteTask: tool({
+          description: "Delete an existing task from the user's todo list.",
+          parameters: z.object({
+            id: z.string().describe("The task UUID to delete."),
+          }),
+          execute: async ({ id }) => {
+            const { error } = await repository.deleteTaskById(id);
+            if (error) {
+              return "Could not delete the task. Please try again later.";
+            }
+            return "Task deleted successfully.";
+          },
+        }),
+        scheduleJob: tool({
+          description: "Schedule a job for the user.",
+          parameters: z.object({
+            name: z.string().describe("The name of the job."),
+            schedule: z
+              .string()
+              .describe(
+                "The schedule of the job. 'yyyy-MM-dd HH:mm' format if one-time, cron expression if cron. The minimum interval is 5 minute.",
+              ),
+            type: z.enum(["one-time", "cron"]).describe("The type of the job."),
+            message: z
+              .string()
+              .describe("The message to sent when the job runs."),
+          }),
+          execute: async ({ name, schedule, type, message }) => {
+            const { data: job, error } = await repository.createJob({
+              userId: user.id,
+              status: "pending",
+              schedule,
+              type,
+              name,
+              parameters: { type: "push-message", message: message },
+            });
+            if (error) {
+              return "Could not schedule the job. Please try again later.";
+            }
+            return `Job scheduled successfully: ${job.name} (Status: ${job.status}, Schedule: ${job.schedule}, Type: ${job.type}, Message: ${message})`;
+          },
+        }),
+        removeJob: tool({
+          description: "Remove a scheduled job for the user.",
+          parameters: z.object({
+            id: z.string().describe("The job UUID to remove."),
+          }),
+          execute: async ({ id }) => {
+            await repository.deleteJobById(id);
+            return "Job removed successfully.";
+          },
+        }),
+        getJobs: tool({
+          description: "Retrieve the user's scheduled jobs.",
+          parameters: z.object({}),
+          execute: async () => {
+            const { data: jobs } = await repository.getJobsByUserId(user.id);
+            if (!jobs) {
+              return "Could not retrieve the user's scheduled jobs.";
+            }
+            if (jobs.length === 0) {
+              return "The user does not have any scheduled jobs.";
+            }
+            return jobs;
           },
         }),
         createMemory: tool({

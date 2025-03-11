@@ -26,7 +26,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
 import { useToast } from "@workspace/ui/hooks/use-toast";
@@ -85,13 +84,12 @@ export default function FeedbackDialog() {
 
   const FeedbackForm = () => (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="px-4 w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className=" w-full">
         <FormField
           control={form.control}
           name="feedback"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>意見</FormLabel>
               <FormControl>
                 <AutosizeTextarea
                   minHeight={96}
