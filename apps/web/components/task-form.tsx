@@ -84,8 +84,9 @@ export default function TaskForm({
     };
     if (initialData) {
       onUpdate(task.id, task);
+    } else {
+      onInsert(task);
     }
-    onInsert(task);
     onClose();
   };
 
