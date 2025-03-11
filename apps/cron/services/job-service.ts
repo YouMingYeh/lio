@@ -1,6 +1,6 @@
-import { CronJob, Job, JobParameters, OneTimeJob } from "@/types.js";
 import { createJob, updateJobById } from "@/repositories/job-repository.js";
 import { pushMessages } from "@/services/messaging-service.js";
+import { CronJob, Job, JobParameters, OneTimeJob } from "@/types.js";
 
 export async function runCronJob(job: CronJob) {
   const { data, error } = await runJob(job);
