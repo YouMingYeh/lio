@@ -1,4 +1,4 @@
-import { getJobs } from "@/repositories/job-repository.js";
+import { getJobs, getPendingJobs } from "@/repositories/job-repository.js";
 import { runCronJob, runOneTimeJob } from "@/services/job-service.js";
 import { CronJob, OneTimeJob } from "@/types.js";
 import { validate } from "node-cron";
@@ -9,7 +9,7 @@ export async function run() {
   });
   console.log(`Current Taipei time: ${currentTaipeiTime}`);
 
-  const { data: jobs } = await getJobs();
+  const { data: jobs } = await getPendingJobs();
   console.log(`Found ${jobs?.length} jobs.`);
   console.log(jobs);
   if (!jobs) {

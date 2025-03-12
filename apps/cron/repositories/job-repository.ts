@@ -18,6 +18,20 @@ export async function getJobs(): Promise<
   return { data: snakeToCamelCase(data), error: null };
 }
 
+export async function getPendingJobs(): Promise<
+  { data: Job[]; error: null } | { data: null; error: Error }
+> {
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("job")
+    .select("*")
+    .eq("status", "pending");
+  if (error) {
+    return { data: null, error };
+  }
+  return { data: snakeToCamelCase(data), error: null };
+}
+
 export async function updateJobById(id: string, updates: JobUpdate) {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
