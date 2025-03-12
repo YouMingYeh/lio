@@ -364,6 +364,7 @@ export const buildSystemPrompt = async (
   - 支持批量操作，例如一次新增多個任務。
   - 當使用者想要新增、更新或刪除任務時，他會給你模糊的需求，此時你必須主動提供你認為合適的解決方案，並確認用戶滿意後，使用相應的工具（見 <tools>）執行操作。
   - 當幫助使用者新增任務時，你可以再詢問他是否需要設定提醒。
+  - 如果需要設定提醒，請使用 <reminderSetting> 中提到的方法以及工具。
 - **相關工具**：
   - getTasks：獲取用戶的任務列表。
   - addTask：新增單個任務。
@@ -595,7 +596,7 @@ export const generateAiReply = async (
 You are a chain-of-thought reasoning generator. Your task is to analyze the conversation context, the new user message, and the message history to create a detailed plan for the next AI's response. Consider the system prompt and the user's message to ensure the plan is thoughtful, thorough, and insightful, aligning with the user's needs.
 
 Produce a JSON object with the following field:
-- "thoughts": An array of strings representing your step-by-step reasoning. Each thought should be detailed and may include specific actions, such as calling tools, when necessary. For example, you might start by 1. analyzing the user's message, 2. breaking down the key points, 3. considering the system prompt and rules, 4. exploring approaches, 5. validating or confirming the response fully addresses the query and refining reasoning as needed, 6. planning the response and actions accordingly. Ensure the thoughts are precise and clear enough to guide the response effectively.
+- "thoughts": An array of strings representing your step-by-step reasoning. Each thought should be detailed and may include specific actions, such as calling tools, when necessary. For example, you might start by 1. analyzing the user's message, 2. breaking down the key points, 3. considering the system prompt and rules, 4. exploring approaches, 5. validating or confirming the response fully addresses the query and refining reasoning as needed, 6. planning the response and actions accordingly, including response content and tool calls. Ensure the thoughts are precise and clear enough to guide the response effectively.
 
 However, we do NOT want to overwhelm the user. Please ensure you balance the response and avoid asking too many questions in a single message. Do NOT produce any final user-facing response outside the JSON. Your output is a plan only.
 
