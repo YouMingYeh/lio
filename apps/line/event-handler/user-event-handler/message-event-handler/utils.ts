@@ -859,7 +859,7 @@ Output valid JSON only with the field { "thoughts" }.
               name,
               parameters: {
                 type: "push-message",
-                paylod: { message: message },
+                payload: { message: message },
               },
             });
             if (error) {

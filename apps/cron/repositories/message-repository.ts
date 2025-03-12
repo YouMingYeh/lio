@@ -9,7 +9,7 @@ import {
 
 export async function createUserMessage(
   userMessage: MessageInsert,
-): Promise<{ data: Message; error: null } | { data: null; error: string }> {
+): Promise<{ data: Message; error: null } | { data: null; error: Error }> {
   const supabase = createSupabaseClient();
   const { data: message, error } = await supabase
     .from("message")
@@ -19,7 +19,7 @@ export async function createUserMessage(
   if (error) {
     return {
       data: null,
-      error: error.message,
+      error,
     };
   }
   return {
@@ -30,7 +30,7 @@ export async function createUserMessage(
 
 export async function getUserById(
   id: string,
-): Promise<{ data: User; error: null } | { data: null; error: string }> {
+): Promise<{ data: User; error: null } | { data: null; error: Error }> {
   const supabase = createSupabaseClient();
   const { data: user, error } = await supabase
     .from("user")
@@ -40,7 +40,7 @@ export async function getUserById(
   if (error) {
     return {
       data: null,
-      error: error.message,
+      error,
     };
   }
   return {
