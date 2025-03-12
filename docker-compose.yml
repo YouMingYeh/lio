@@ -13,12 +13,16 @@ services:
     platform: linux/amd64
     mem_limit: 2g
     memswap_limit: 4g
+    env_file:
+      - ./apps/web/.env
   cron:
     build:
       context: .
       dockerfile: ./apps/cron/Dockerfile
     restart: unless-stopped
     platform: linux/amd64
+    env_file:
+      - ./apps/cron/.env
 
 networks:
   my_network:
