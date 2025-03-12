@@ -7,21 +7,21 @@ export async function runCronJob(job: CronJob) {
   if (error) {
     console.error("Failed to run job:", error);
     await updateJobById(job.id, { status: "failed" });
-    await createJob({
-      ...job,
-      id: undefined,
-      status: "pending",
-    });
+    // await createJob({
+    //   ...job,
+    //   id: undefined,
+    //   status: "pending",
+    // });
     return;
   }
   if (data) {
     await updateJobById(job.id, { status: "completed" });
     // Duplicate the job if it's a recurring job
-    await createJob({
-      ...job,
-      id: undefined,
-      status: "pending",
-    });
+    // await createJob({
+    //   ...job,
+    //   id: undefined,
+    //   status: "pending",
+    // });
   }
 }
 
