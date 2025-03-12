@@ -17,6 +17,7 @@ import {
   tool,
 } from "ai";
 import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { zhTW } from "date-fns/locale";
 import { ElevenLabsClient } from "elevenlabs";
 import { z } from "zod";
@@ -312,7 +313,10 @@ export const buildSystemPrompt = async (
         }}`,
     );
 
-  const currentTaipeiTimeWithWeekday = format(new Date(), "PPPPp", {
+  const taipeiTimeZone = "Asia/Taipei";
+  const utcDate = new Date();
+  const taipeiDate = toZonedTime(utcDate, taipeiTimeZone);
+  const currentTaipeiTimeWithWeekday = format(taipeiDate, "PPPPp", {
     locale: zhTW,
   });
   // example output: "星期四，2022年3月17日 下午2:30"
@@ -417,7 +421,7 @@ export const buildSystemPrompt = async (
 - **提醒屬性**：
   - 名稱（name）：提醒的標識。
   - 狀態（status）：如 "pending" 或 "completed"。
-  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。直接使用台北時間。Cron 表達式格式有五個欄位，分別代表分、時、日、月、週，例如 "0 9 * * 1-5"，代表每週一至週五早上 9 點提醒。
+  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。直接使用台北時間。Cron 表達式格式有五個欄位，分別代表分、時、日、月、週，例如 "0 9 * * 1-5"，代表每週一至週五早上 9 點提醒。注意，你的最小單位為五分鐘，如果使用者要求的時間不是以五分鐘為間隔（如 10:33），請將其調整為最接近的五分鐘（如 10:35），並告訴使用者你的困難。
   - 類型（type）："one-time" 或 "cron"。
   - 訊息內容（message）：提醒時發送的文字。
 - **行為**：
