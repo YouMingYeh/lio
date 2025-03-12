@@ -40,7 +40,7 @@ export async function runJob(job: Job) {
   const parameters = job.parameters as JobParameters;
   switch (parameters.type) {
     case "push-message":
-      return await pushMessages(parameters);
+      return await pushMessages(job.userId, parameters);
     default:
       console.error(`Unknown job parameters type: ${parameters.type}`);
       return { data: null, error: new Error("Unknown job parameters type") };

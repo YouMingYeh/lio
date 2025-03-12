@@ -5,10 +5,12 @@ import {
 } from "@/repositories/message-repository.js";
 import { User, PushMessageJobParameters } from "@/types.js";
 
-export async function pushMessages(parameters: PushMessageJobParameters) {
+export async function pushMessages(
+  userId: string,
+  parameters: PushMessageJobParameters,
+) {
   console.log("Pushing messages...");
   // Push user messages
-  const userId = parameters.payload.userId;
   const { data } = await getUserById(userId);
   if (!data) {
     console.error(`User ${userId} not found.`);

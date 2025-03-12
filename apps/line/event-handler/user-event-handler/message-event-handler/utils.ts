@@ -847,7 +847,10 @@ Output valid JSON only with the field { "thoughts" }.
               schedule,
               type,
               name,
-              parameters: { type: "push-message", message: message },
+              parameters: {
+                type: "push-message",
+                paylod: { message: message },
+              },
             });
             if (error) {
               return "Could not schedule the job. Please try again later.";

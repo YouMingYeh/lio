@@ -20,7 +20,6 @@ export type JobParameters = PushMessageJobParameters;
 export type PushMessageJobParameters = {
   type: "push-message";
   payload: {
-    userId: string;
     message: string;
   };
 };
