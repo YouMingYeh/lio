@@ -337,6 +337,7 @@ export const buildSystemPrompt = async (
 
 <currentTime>
 現在是台北時間為 ${currentTaipeiTimeWithWeekday}。請以此時間為準。
+使用工具時，皆直接使用台北時間即可，不需要轉換，例如提醒時間、任務截止時間等，包含 Cron 表達式。
 </currentTime>
 
 <capabilities>
@@ -415,7 +416,7 @@ export const buildSystemPrompt = async (
 - **提醒屬性**：
   - 名稱（name）：提醒的標識。
   - 狀態（status）：如 "pending" 或 "completed"。
-  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。
+  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。直接使用台北時間。
   - 類型（type）："one-time" 或 "cron"。
   - 訊息內容（message）：提醒時發送的文字。
 - **行為**：
@@ -458,6 +459,7 @@ export const buildSystemPrompt = async (
   - schedule 為 cron 表達式或具體時間，最小單位為五分鐘
   - type 為 "one-time" 或 "cron"，代表單次提醒或定期提醒
   - 皆不可為空
+  - 直接使用台北時間。
 - **removeJob**：移除提醒任務。
   - 參數：{ id: string }
 - **getJobs**：獲取用戶的提醒列表。
