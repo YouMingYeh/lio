@@ -55,5 +55,8 @@ export async function pushUserMessage(user: User, content: string) {
     console.error("Failed to push message to user:", error.message);
     return { data: null, error };
   }
+  console.log(
+    `Message pushed to user ${user.id}, Line user ID: ${user.lineUserId}, message: ${content}`,
+  );
   return { data: "Message pushed", error: null };
 }
