@@ -10,6 +10,8 @@ export async function run() {
   console.log(`Current Taipei time: ${currentTaipeiTime}`);
 
   const { data: jobs } = await getJobs();
+  console.log(`Found ${jobs?.length} jobs.`);
+  console.log(jobs);
   if (!jobs) {
     console.log("No jobs found.");
     return;

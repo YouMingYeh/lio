@@ -32,6 +32,7 @@ export async function pushMessages(parameters: PushMessageJobParameters) {
   });
   if (CreateError) {
     console.error("Failed to create user message:", CreateError);
+    return { data: null, error: CreateError };
   }
   return { data: "Message pushed", error: null };
 }

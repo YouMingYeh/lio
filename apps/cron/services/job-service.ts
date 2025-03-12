@@ -5,7 +5,7 @@ import { CronJob, Job, JobParameters, OneTimeJob } from "@/types.js";
 export async function runCronJob(job: CronJob) {
   const { data, error } = await runJob(job);
   if (error) {
-    console.error("Failed to run job:", error.message);
+    console.error("Failed to run job:", error);
     await updateJobById(job.id, { status: "failed" });
     await createJob({
       ...job,
@@ -28,7 +28,7 @@ export async function runCronJob(job: CronJob) {
 export async function runOneTimeJob(job: OneTimeJob) {
   const { data, error } = await runJob(job);
   if (error) {
-    console.error("Failed to run job:", error.message);
+    console.error("Failed to run job:", error);
     return;
   }
   if (data) {
