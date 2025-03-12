@@ -416,7 +416,7 @@ export const buildSystemPrompt = async (
 - **提醒屬性**：
   - 名稱（name）：提醒的標識。
   - 狀態（status）：如 "pending" 或 "completed"。
-  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。直接使用台北時間。
+  - 時間表（schedule）：支持 cron 表達式（定期）或具體時間（單次）。最小單位為五分鐘。直接使用台北時間。Cron 表達式格式有五個欄位，分別代表分、時、日、月、週，例如 "0 9 * * 1-5"，代表每週一至週五早上 9 點提醒。
   - 類型（type）："one-time" 或 "cron"。
   - 訊息內容（message）：提醒時發送的文字。
 - **行為**：
