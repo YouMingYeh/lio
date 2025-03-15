@@ -1,4 +1,5 @@
 import { Job } from "@/types/database";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -42,7 +43,13 @@ export function JobList({
         {jobs.map((job) => (
           <TableRow key={job.id}>
             <TableCell className="font-medium">{job.name}</TableCell>
-            <TableCell>{job.status}</TableCell>
+            <TableCell>
+              <Status
+                status={
+                  job.status as "pending" | "completed" | "failed" | "paused"
+                }
+              />
+            </TableCell>
             <TableCell>{job.schedule}</TableCell>
             <TableCell className="text-right">
               <DropdownMenu>
@@ -74,4 +81,24 @@ export function JobList({
       </TableFooter>
     </Table>
   );
+}
+
+function Status({
+  status,
+}: {
+  status: "pending" | "completed" | "failed" | "paused";
+}) {
+  const names = {
+    pending: "待執行",
+    completed: "已完成",
+    failed: "失敗",
+    paused: "暫停",
+  };
+  const colors = {
+    pending: "blue",
+    completed: "green",
+    failed: "destructive",
+    paused: "yellow",
+  } as const;
+  return <Badge variant={colors[status]}>{names[status]}</Badge>;
 }
