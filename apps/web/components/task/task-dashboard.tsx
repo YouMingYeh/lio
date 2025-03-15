@@ -131,8 +131,17 @@ export default function TaskDashboard() {
     toast.success("任務已刪除");
   };
 
-  const toggleTaskCompletion = (id: string) => {
+  const toggleTaskCompletion = async (id: string) => {
     const taskToToggle = tasks.find((t) => t.id === id);
+    const { data } = await updateTaskById(id, {
+      completed: !taskToToggle?.completed,
+    });
+    if (!data) {
+      toast.error("無法更新任務");
+      return;
+    }
+    const updatedTasks = tasks.map((task) => (task.id === id ? data : task));
+    setTasks(updatedTasks);
     if (taskToToggle) {
       const updatedTask = {
         ...taskToToggle,

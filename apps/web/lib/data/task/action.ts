@@ -18,7 +18,8 @@ export async function getTasksByUserId(userId: string): Promise<
   const { data, error } = await supabase
     .from("task")
     .select("*")
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false }); // New tasks first
   if (error) {
     return {
       data: null,

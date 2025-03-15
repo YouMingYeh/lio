@@ -18,7 +18,8 @@ export async function getJobsByUserId(userId: string): Promise<
   const { data, error } = await supabase
     .from("job")
     .select("*")
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
   if (error) {
     return {
       data: null,
