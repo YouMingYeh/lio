@@ -2,7 +2,7 @@ import { Json } from "@/database.types.js";
 import { parseFile } from "@/lib/file.js";
 import { LINEAPIClient } from "@/lib/messaging-api/index.js";
 import { Repository } from "@/lib/repository/index.js";
-import { Message, User, Task } from "@/lib/types.js";
+import { Message, User, Task, CoreMessageContent } from "@/lib/types.js";
 import { removeMarkdown } from "@/lib/utils.js";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -34,14 +34,22 @@ export async function saveToolResult(
   toolCallParts: ToolCallPart[],
   toolResultParts: ToolResultPart[],
 ) {
+  if (toolCallParts.length !== toolResultParts.length) {
+    console.error(
+      "Tool call and result parts length mismatch:",
+      toolCallParts.length,
+      toolResultParts.length,
+    );
+    return;
+  }
   const { error: toolCallError } = await repository.createMessage({
     userId: user.id,
-    content: toolCallParts as unknown as Json,
-    role: "tool",
+    content: toolCallParts as CoreMessageContent as Json,
+    role: "assistant",
   });
   const { error: toolResultError } = await repository.createMessage({
     userId: user.id,
-    content: toolResultParts as unknown as Json,
+    content: toolResultParts as CoreMessageContent as Json,
     role: "tool",
   });
   if (toolCallError || toolResultError) {
