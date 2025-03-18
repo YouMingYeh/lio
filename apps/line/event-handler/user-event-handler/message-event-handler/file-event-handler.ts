@@ -11,7 +11,7 @@ import { Repository } from "@/lib/repository/index.js";
 import { CoreMessageContent, Message, User, Task } from "@/lib/types.js";
 import { webhook } from "@line/bot-sdk";
 import {
-  CoreAssistantMessage,
+  CoreMessage,
   CoreUserMessage,
   FilePart,
   ToolCallPart,
@@ -59,7 +59,10 @@ const fileEventHandler = async (
 
   // Generate and process AI reply
   const systemPrompt = await buildSystemPrompt(messages, tasks, user);
-  const formattedMessages = convertMessagesToAiFormat(messages);
+  const formattedMessages = messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  })) as CoreMessage[];
 
   const { steps, toolCalls, toolResults } = await generateAiReplyWithRetry(
     user,
@@ -119,27 +122,6 @@ function createFileMessage(fileParts: FilePart[]): CoreUserMessage {
 }
 
 /**
- * Converts messages to the format expected by AI functions
- */
-function convertMessagesToAiFormat(
-  messages: Message[],
-): (CoreAssistantMessage | CoreUserMessage)[] {
-  return messages.map((message) => {
-    if (message.role === "assistant") {
-      return {
-        role: "assistant",
-        content: message.content as CoreMessageContent,
-      } as CoreAssistantMessage;
-    } else {
-      return {
-        role: "user",
-        content: message.content as CoreMessageContent,
-      } as CoreUserMessage;
-    }
-  });
-}
-
-/**
  * Processes generated steps to remove duplicates
  */
 function processGeneratedOutput(generated: GeneratedOutput): {
@@ -178,7 +160,7 @@ function processGeneratedOutput(generated: GeneratedOutput): {
 async function generateAiReplyWithRetry(
   user: User,
   repository: Repository,
-  formattedMessages: (CoreAssistantMessage | CoreUserMessage)[],
+  formattedMessages: CoreMessage[],
   systemPrompt: string,
   newMessage: CoreUserMessage,
 ): Promise<{

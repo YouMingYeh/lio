@@ -10,12 +10,7 @@ import { LINEAPIClient } from "@/lib/messaging-api/index.js";
 import { Repository } from "@/lib/repository/index.js";
 import { CoreMessageContent, Message, User, Task } from "@/lib/types.js";
 import { webhook } from "@line/bot-sdk";
-import {
-  CoreAssistantMessage,
-  CoreUserMessage,
-  ToolCallPart,
-  ToolResultPart,
-} from "ai";
+import { CoreMessage, CoreUserMessage, ToolCallPart, ToolResultPart } from "ai";
 
 // Define proper types instead of using 'any'
 interface Step {
@@ -52,8 +47,10 @@ const textEventHandler = async (
 
   // Generate and process AI reply
   const systemPrompt = await buildSystemPrompt(messages, tasks, user);
-  const formattedMessages = convertMessagesToAiFormat(messages);
-
+  const formattedMessages = messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  })) as CoreMessage[];
   const { steps, toolCalls, toolResults } = await generateAiReplyWithRetry(
     user,
     repository,
@@ -86,27 +83,6 @@ function createUserMessage(text: string): CoreUserMessage {
     role: "user",
     content: [{ type: "text", text }],
   } as CoreUserMessage;
-}
-
-/**
- * Converts messages to the format expected by AI functions
- */
-function convertMessagesToAiFormat(
-  messages: Message[],
-): (CoreAssistantMessage | CoreUserMessage)[] {
-  return messages.map((message) => {
-    if (message.role === "assistant") {
-      return {
-        role: "assistant",
-        content: message.content as CoreMessageContent,
-      } as CoreAssistantMessage;
-    } else {
-      return {
-        role: "user",
-        content: message.content as CoreMessageContent,
-      } as CoreUserMessage;
-    }
-  });
 }
 
 /**
@@ -148,7 +124,7 @@ function processGeneratedOutput(generated: GeneratedOutput): {
 async function generateAiReplyWithRetry(
   user: User,
   repository: Repository,
-  formattedMessages: (CoreAssistantMessage | CoreUserMessage)[],
+  formattedMessages: CoreMessage[],
   systemPrompt: string,
   newMessage: CoreUserMessage,
 ): Promise<{
