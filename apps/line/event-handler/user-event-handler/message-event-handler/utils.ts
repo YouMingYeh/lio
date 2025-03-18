@@ -1,3 +1,4 @@
+import { Json } from "@/database.types.js";
 import { parseFile } from "@/lib/file.js";
 import { LINEAPIClient } from "@/lib/messaging-api/index.js";
 import { Repository } from "@/lib/repository/index.js";
@@ -6,7 +7,7 @@ import { removeMarkdown } from "@/lib/utils.js";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { PlaywrightWebBaseLoader } from "@langchain/community/document_loaders/web/playwright";
-import { messagingApi } from "@line/bot-sdk";
+import { messagingApi, webhook } from "@line/bot-sdk";
 import {
   CoreMessage,
   CoreUserMessage,
@@ -15,12 +16,39 @@ import {
   generateText,
   NoSuchToolError,
   tool,
+  ToolCallPart,
+  ToolResultPart,
 } from "ai";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { zhTW } from "date-fns/locale";
 import { ElevenLabsClient } from "elevenlabs";
 import { z } from "zod";
+
+/**
+ * Save the tool result to the database.
+ */
+export async function saveToolResult(
+  repository: Repository,
+  user: User,
+  toolCallParts: ToolCallPart[],
+  toolResultParts: ToolResultPart[],
+) {
+  const { error: toolCallError } = await repository.createMessage({
+    userId: user.id,
+    content: toolCallParts as unknown as Json,
+    role: "tool",
+  });
+  const { error: toolResultError } = await repository.createMessage({
+    userId: user.id,
+    content: toolResultParts as unknown as Json,
+    role: "tool",
+  });
+  if (toolCallError || toolResultError) {
+    console.error("Error saving tool result:", toolCallError, toolResultError);
+  }
+  console.log("Tool result saved successfully.");
+}
 
 /**
  * Get the duration of an audio file in seconds from a remote URL
