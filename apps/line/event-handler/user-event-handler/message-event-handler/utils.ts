@@ -354,7 +354,6 @@ export const buildSystemPrompt = async (
 與你對話的使用者資訊在 <userInfo> 中。
 你的能力描述在 <capabilities> 中。
 你可以使用的工具在 <tools> 中，請在回覆前都先思考是否以及如何使用這些工具。
-你可以使用的心智模型在 <mentalModels> 中，當需要深度分析時可應用這些模型。
 你的任務與日程管理功能在 <taskManagement> 中，目前尚未完成的任務在下方列出，如果需要知道更多任務的詳細資訊，可以使用 getTasks 工具。
 你的智慧提醒設定功能在 <reminderSetting> 中，可以幫助使用者設定提醒，請先向使用者確認提醒的內容後，使用工具設定提醒。
 你的回覆方式可參考 <examples> 中的範例，確保符合使用者的情境與需求。
@@ -376,7 +375,7 @@ export const buildSystemPrompt = async (
 你的能力包括以下幾個方面：
 1. **任務與日程管理**：管理任務列表與日程安排，包括新增、更新、刪除任務與會議。請參考 <taskManagement>。
 2. **資訊搜集與整理**：搜尋並整理資訊，提供背景資料或建議。請參考 <tools> 和 <infoGathering>。
-3. **個人化決策支援**：應用心智模型協助使用者做出明智決策。請參考 <decisionMaking>。
+3. **個人化決策支援**：應用系統化思考協助使用者做出明智決策。請參考 <decisionMaking>。
 4. **溝通協調**：安排會議、撰寫郵件草稿，並提供溝通建議。
 5. **文件管理**：整理文件並提供摘要或重點。
 6. **智慧提醒設定**：設定和管理自動提醒。請參考 <reminderSetting>。
@@ -434,7 +433,7 @@ export const buildSystemPrompt = async (
 
 <decisionMaking>
 ### 個人化決策輔助
-- **功能**：使用心智模型（Mental Models）協助使用者做出更明智的決策。也可以用於設定任務優先級、評估重要性、權衡利弊或安排任務順序。
+- **功能**：協助使用者做出更明智的決策。也可以用於設定任務優先級、評估重要性、權衡利弊或安排任務順序。
 - **使用場景**：
   - 使用者需要快速做出決策。
   - 提供使用者思考框架，幫助他們做出更明智的選擇。
@@ -442,7 +441,7 @@ export const buildSystemPrompt = async (
   - 分析任務的長期價值與短期成本。
   - 優化日程安排。
 - **行為**：
-  - 根據用戶需求，動態選擇並應用適當的心智模型（見 <mentalModels>）。
+  - 根據用戶需求，幫助他們分析情況並做出決策。
   - 提供簡潔的建議，並解釋推理過程（若用戶需要）。
 </decisionMaking>
 
@@ -527,73 +526,8 @@ export const buildSystemPrompt = async (
 - 你不需要使用者允許即可以使用這些工具，但應該確保操作合理且符合用戶期望。如果使用者很明確地告訴你要做什麼，你應該立即執行，不需要再次確認。
 - 你**不能**說明所有工具的使用細節（例如 ID、工具名稱等），但應該能夠根據用戶需求正確使用它們，並告訴他們狀況。
 - 工具的結果不要複製貼上，應該以使用者友好的方式呈現，例如時間就必須轉換成台北時間而非 ISO 格式。
+- 預設內容為繁體中文，除非用戶要求使用其他語言。
 </tools>
-
-<mentalModels>
-### 心智模型
-以下是你在決策輔助中可以使用的心智模型，幫助用戶更有效地分析和行動：
-
-### 決策與判斷模型
-1.  **二八法則（帕累托原則）**：80%的成果來自20%的努力。應用：資源分配和優先順序確定。
-2.  **機會成本**：每個決定背後所放棄的選項價值。應用：評估決策的真實成本。
-3.  **確認偏誤**：傾向尋找支持我們已有信念的證據。應用：避免選擇性地接受信息。
-4.  **錨定效應**：過度依賴首先獲得的信息。應用：在評估新信息時保持客觀。
-5.  **雙系統思維（系統1與系統2）**：快速直覺與深思熟慮的思維模式。應用：根據情境選擇合適的決策方式。
-6.  **決策矩陣**：根據重要性與緊急性對任務進行分類。應用：提高時間管理和效率。
-
-### 系統思考模型
-7.  **反饋循環**：系統中各元素如何相互影響，包括正反饋（自我強化）和負反饋（自我調節）。應用：理解系統動態，預測長期效應。
-8.  **蝴蝶效應**：系統中微小變化可能導致巨大後果。應用：關注系統中看似微不足道的因素。
-9.  **瓶頸理論（TOC）**：找出限制系統整體效率的關鍵因素。應用：優化業務流程。
-
-### 概率與風險模型
-10. **蒙特卡洛模擬**：通過大量隨機嘗試來預測可能的結果分布。應用：量化不確定性，進行風險評估。
-11. **貝葉斯定理**：在獲取新證據後更新信念的框架。應用：持續評估和調整判斷。
-12. **黑天鵝事件**：極端且難以預測的事件雖然罕見，但可能產生巨大影響。應用：風險管理中考慮低概率高影響事件。
-13. **賽局理論**：分析競爭與合作策略。應用：制定最佳市場或談判策略。
-14. **沉沒成本謬誤**：因為已投入資源而不願放棄錯誤決策。應用：避免非理性決策。
-
-### 學習與增長模型
-15. **成長思維模式**：相信能力可以通過努力和學習而提升。應用：面對挑戰時保持積極。
-16. **刻意練習**：有針對性、持續反饋和逐步提高難度的練習方式。應用：提升技能和專業知識。
-17. **抗逆力**：在逆境中保持堅韌，並從失敗中學習成長。應用：應對挑戰和克服困難。
-18. **費曼學習法**：通過教別人來加深理解。應用：提高學習效率。
-
-### 職場與管理應用
-19. **團隊動力學**：理解團隊合作和溝通的內部機制。應用：更有效地引導團隊合作和溝通，特別是在面對衝突或需要快速決策時。
-20. **情境領導**：根據團隊成員的成熟度和具體情境調整領導風格。應用：實現更有效的引導和激勵。
-21. **OKR（目標與關鍵結果）**：設定並跟蹤目標的方法。應用：確保組織與個人目標對齊。
-22. **梅特卡夫定律**：網絡的價值與用戶數的平方成正比。應用：理解平台與社群效應。
-
-### 商業與創業應用
-23. **波特五力模型**：分析行業競爭格局。應用：評估市場吸引力和競爭態勢。
-24. **精益創業（Lean Startup）**：快速試驗、學習和調整。應用：降低創業風險，提高產品適配度。
-25. **產品市場契合（PMF）**：判斷產品是否滿足市場需求。應用：提升商業成功率。
-26. **AARRR 漏斗模型**：用戶獲取、激活、留存、變現、推薦。應用：增強商業增長策略。
-
-### 認知提升與批判性思維
-27. **可證偽性原則**：區分科學與非科學主張。應用：評估信息的可靠性和有效性。
-28. **奧卡姆剃刀**：當有多種解釋時，選擇最簡單的那一種。應用：減少不必要的假設。
-29. **思維慣性**：我們容易根據過去經驗做決策。應用：跳脫傳統思維框架。
-
-### 溝通與影響力
-30. **漢堡模型**：正面、負面、正面結構的溝通方式。應用：清晰表達觀點和建議。
-31. **情境認知理論**：人們根據情境和環境進行溝通。應用：理解溝通背後的動機和目的。
-32. **說故事技巧**：通過故事傳達信息和價值觀。應用：提高信息吸引力和記憶度。
-33. **情感勸說**：通過情感和情感連結影響他人。應用：提高溝通效果和影響力。
-
-### 其他模型
-34. **第一性原理**：從最基本的假設出發進行推理。應用：找到創新解決方案。
-35. **逆向思維**：從相反的角度思考問題。應用：發現隱藏的機會和風險。
-36. **破窗效應**：環境中的小問題若不解決，可能導致更嚴重問題。應用：維護企業文化與紀律。
-37. **長尾理論**：少數熱門產品之外，冷門產品也能產生大量需求。應用：擴展市場機會。
-
-**應用方式**：
-1. 根據用戶的具體問題，選擇**一個**最適當的心智模型。
-2. 搜尋網路對於模型的解釋和案例，以便更好地應用。
-3. 直接使用模型幫助用戶思考，幫助他們做出更明智的決策。
-4. 提供清晰的解釋和建議，以幫助用戶理解和接受你的建議。
-</mentalModels>
 
 <guidelines>
 ### 行為準則
@@ -641,17 +575,20 @@ export const generateAiReply = async (
 ) => {
   try {
     const PLANNING_PROMPT = `
-You are a chain-of-thought reasoning generator. Your task is to analyze the conversation context, the new user message, and the message history to create a detailed plan for the next AI's response. Consider the system prompt and the user's message to ensure the plan is thoughtful, thorough, and insightful, aligning with the user's needs.
+您是一個連鎖思考推理（Chain-of-thought reasoning）生成器。您的任務是分析對話上下文、新的用戶訊息和訊息歷史，為 AI 的下一個回應創建詳細計畫。考慮系統提示和用戶的訊息，確保計畫是深思熟慮、全面且有洞察力的，並符合用戶的需求。
 
-Produce a JSON object with the following field:
-- "thoughts": An array of strings representing your step-by-step reasoning. Each thought should be detailed and may include specific actions, such as calling tools, when necessary. For example, you might start by 1. analyzing the user's message, 2. breaking down the key points, 3. considering the system prompt and rules, 4. exploring approaches, 5. validating or confirming the response fully addresses the query and refining reasoning as needed, 6. planning the response and actions accordingly, including response content and tool calls. Ensure the thoughts are precise and clear enough to guide the response effectively.
+請生成包含以下欄位的 JSON 物件：
+- "thoughts"：代表您逐步推理的字串陣列。每個想法都應該詳細，並可能在必要時包含特定行動，如呼叫工具。例如，您可能會先 1. 分析用戶的訊息，2. 分解關鍵點，3. 考慮系統提示和規範，4. 探索可能方法，5. 驗證或確認回應完全解決查詢並視需要修改推理，6. 相應地計畫回應和行動，如如何回覆或呼叫哪些工具。確保想法足夠精確清晰，以有效指導回應，使其符合規範並滿足用戶需求。
 
-However, we do NOT want to overwhelm the user. Please ensure you balance the response and avoid asking too many questions in a single message. Do NOT produce any final user-facing response outside the JSON. Your output is a plan only.
+但是，我們不希望讓用戶感到不知所措。請確保您平衡回應，避免在單個訊息中提出過多問題。請不要在 JSON 之外生成任何最終面向用戶的回應。您的輸出僅是一個計畫。
 
-System Prompt (for reference only):
+系統提示（僅供參考）：
+<systemPrompt>
 ${systemPrompt}
+</systemPrompt>
+請參考以上 systemPrompt 一個符合上述的詳細計畫。
 
-Output valid JSON only with the field { "thoughts" }.
+僅輸出包含欄位 { "thoughts" } 的有效 JSON。
 `;
 
     const planningResponse = await generateObject({
@@ -659,36 +596,23 @@ Output valid JSON only with the field { "thoughts" }.
       schema: z.object({
         thoughts: z
           .array(z.string())
-          .describe(
-            "Step-by-step reasoning, including specific actions like tool calls when necessary",
-          ),
+          .describe("逐步推理，必要時包括回應內容、或特定行動如工具呼叫"),
       }),
       system: PLANNING_PROMPT,
       messages: [...coreMessages, newMessage],
-      temperature: 0.3,
     });
 
     const { thoughts } = planningResponse.object;
 
     const reasoning = `
     <think>
-    Based on my hidden chain-of-thought, here's the plan for your response:
+    根據我的隱藏連鎖思考（Chain-of-thought Reasoning），以下是您回應的計畫：
     - ${thoughts.join("\n- ")}
     </think>
-    Follow this plan to generate your response. Execute any actions, like calling tools, as needed based on the context.
+    按照此計畫回應與行動。根據上下文需要執行任何行動，如呼叫工具。
     `;
-
-    console.log("=== AI's Hidden Reasoning (Chain-of-Thought) ===");
-    thoughts.forEach((step, i) => {
-      console.log(`Step ${i + 1}: ${step}`);
-    });
-    console.log("===============================================");
-
     // -------------------------------
     // STEP 2: EXECUTION
-    // Now that we have the plan in "proposedAnswer", we do the final generation.
-    // The final generation can use tools if the model requests them. We'll incorporate
-    // the "proposedAnswer" as a prior system or user message.
     // -------------------------------
     return generateText({
       model: google("gemini-2.0-flash-001"),
@@ -696,24 +620,23 @@ Output valid JSON only with the field { "thoughts" }.
       messages: [...coreMessages, newMessage],
       tools: {
         searchWeb: tool({
-          description:
-            "Searches the web for information based on a query string.",
+          description: "搜尋網路資訊以獲取相關資料，並提供給用戶。",
           parameters: z.object({ query: z.string() }),
           execute: async ({ query }) => {
             const result = await generateText({
               model: google("gemini-2.0-flash-001", {
                 useSearchGrounding: true,
               }),
-              system: "Perform a web search for the user query.",
-              prompt: `The user wants to search for: ${query}. Please provide relevant information.`,
+              system: "根據用戶的查詢詞搜尋網路資訊。",
+              prompt: `使用者想要搜尋： ${query}. 請提供相關的網路資訊。`,
             });
             return result.text;
           },
         }),
         loadWebContent: tool({
-          description: "Load web content from a given URL.",
+          description: "從指定的 URL 加載網頁內容。",
           parameters: z.object({
-            url: z.string().describe("The URL to load content from."),
+            url: z.string().describe("要加載內容的 URL。"),
           }),
           execute: async ({ url }) => {
             const loader = new PlaywrightWebBaseLoader(url);
@@ -727,46 +650,44 @@ Output valid JSON only with the field { "thoughts" }.
           },
         }),
         loadFileContent: tool({
-          description: "Load content from a file URL.",
+          description: "從指定的文件 URL 加載內容。",
           parameters: z.object({
-            url: z.string().describe("The URL to load content from."),
+            url: z.string().describe("要加載內容的文件 URL。"),
           }),
           execute: async ({ url }) => {
             const text = await parseFile(url);
             if (!text || text.length === 0) {
-              return "Could not parse the file content.";
+              return "無法加載文件內容。請檢查文件格式或內容。";
             }
             return text;
           },
         }),
         getTasks: tool({
-          description: "Retrieve the user's todo list.",
+          description: "獲取用戶的任務列表。",
           parameters: z.object({}),
           execute: async () => {
             const { data: tasks } = await repository.getTasksByUserId(user.id);
             if (!tasks) {
-              return "Could not retrieve the user's task list.";
+              return "無法獲取任務列表。請稍後再試。";
             }
             if (tasks.length === 0) {
-              return "The user does not have any tasks in the list.";
+              return "目前沒有任何任務。";
             }
             return tasks;
           },
         }),
         addTask: tool({
-          description: "Add a new task to the user's todo list.",
+          description: "新增一個新的任務到用戶的待辦清單。",
           parameters: z.object({
-            title: z.string().describe("The title of the new task."),
-            description: z
-              .string()
-              .describe("The description of the new task."),
+            title: z.string().describe("新任務的標題。"),
+            description: z.string().describe("新任務的描述。"),
             dueAt: z
               .string()
               .optional()
-              .describe("The due date of the new task."),
+              .describe("新任務的截止日期（如果有）。"),
             priority: z
               .enum(["low", "medium", "high", "urgent"])
-              .describe("The priority of the new task."),
+              .describe("新任務的優先級。"),
           }),
           execute: async ({ title, description, dueAt, priority }) => {
             const { data: word, error } = await repository.createTask({
@@ -778,27 +699,25 @@ Output valid JSON only with the field { "thoughts" }.
               completed: false,
             });
             if (error) {
-              return "Could not add the task. Please try again later.";
+              return "無法新增任務。請稍後再試。";
             }
-            return `Task added successfully: ${word.title} - ${word.description} (Due: ${word.dueAt}, Priority: ${word.priority})`;
+            return `任務新增成功：${word.title} - ${word.description} (截止日期: ${word.dueAt}, 優先級: ${word.priority})`;
           },
         }),
         addTasks: tool({
-          description: "Add multiple new tasks to the user's todo list.",
+          description: "批量新增多個任務到用戶的待辦清單。",
           parameters: z.object({
             tasks: z.array(
               z.object({
-                title: z.string().describe("The title of the new task."),
-                description: z
-                  .string()
-                  .describe("The description of the new task."),
+                title: z.string().describe("新任務的標題。"),
+                description: z.string().describe("新任務的描述。"),
                 dueAt: z
                   .string()
                   .optional()
-                  .describe("The due date of the new task if any."),
+                  .describe("新任務的截止日期（如果有）。"),
                 priority: z
                   .enum(["low", "medium", "high", "urgent"])
-                  .describe("The priority of the new task."),
+                  .describe("新任務的優先級。"),
               }),
             ),
           }),
@@ -813,35 +732,31 @@ Output valid JSON only with the field { "thoughts" }.
             }));
             const { data, error } = await repository.createTasks(newTasks);
             if (error) {
-              return "Could not add the tasks. Please try again later.";
+              return "無法批量新增任務。請稍後再試。";
             }
-            return `Tasks added successfully: ${data.map((task) => `${task.title} - ${task.description} (Due: ${task.dueAt}, Priority: ${task.priority})`).join(", ")}`;
+            return `批量任務新增成功：${data
+              .map(
+                (task) =>
+                  `${task.title} - ${task.description} (截止日期: ${task.dueAt}, 優先級: ${task.priority})`,
+              )
+              .join("\n")}`;
           },
         }),
         updateTask: tool({
-          description: "Update an existing task's details.",
+          description: "更新用戶的任務。",
           parameters: z.object({
-            id: z.string().describe("The task UUID to update."),
-            title: z
-              .string()
-              .optional()
-              .describe("The updated title of the task."),
-            description: z
-              .string()
-              .optional()
-              .describe("The updated description of the task."),
+            id: z.string().describe("要更新的任務的 UUID。"),
+            title: z.string().optional().describe("更新任務的標題。"),
+            description: z.string().optional().describe("更新任務的描述。"),
             dueAt: z
               .string()
               .optional()
-              .describe("The updated due date of the task."),
+              .describe("更新任務的截止日期（如果有）。"),
             priority: z
               .enum(["low", "medium", "high", "urgent"])
               .optional()
-              .describe("The updated priority of the task."),
-            completed: z
-              .boolean()
-              .optional()
-              .describe("The updated completion status of the task."),
+              .describe("更新任務的優先級。"),
+            completed: z.boolean().optional().describe("更新任務的完成狀態。"),
           }),
           execute: async ({
             id,
@@ -859,37 +774,35 @@ Output valid JSON only with the field { "thoughts" }.
               completed,
             });
             if (error) {
-              return "Could not update the task. Please try again later.";
+              return "無法更新任務。請稍後再試。";
             }
-            return `Task updated successfully: ${task.title} - ${task.description} (Due: ${task.dueAt}, Priority: ${task.priority}, Completed: ${task.completed})`;
+            return `任務更新成功：${task.title} - ${task.description} (截止日期: ${task.dueAt}, 優先級: ${task.priority}, 完成狀態: ${task.completed})`;
           },
         }),
         deleteTask: tool({
-          description: "Delete an existing task from the user's todo list.",
+          description: "刪除用戶的任務。",
           parameters: z.object({
-            id: z.string().describe("The task UUID to delete."),
+            id: z.string().describe("要刪除的任務的 UUID。"),
           }),
           execute: async ({ id }) => {
             const { error } = await repository.deleteTaskById(id);
             if (error) {
-              return "Could not delete the task. Please try again later.";
+              return "無法刪除任務。請稍後再試。";
             }
-            return "Task deleted successfully.";
+            return "任務刪除成功。";
           },
         }),
         scheduleJob: tool({
-          description: "Schedule a job for the user.",
+          description: "為用戶安排一個新的提醒。",
           parameters: z.object({
-            name: z.string().describe("The name of the job."),
+            name: z.string().describe("提醒的名稱。"),
             schedule: z
               .string()
               .describe(
-                "The schedule of the job. 'yyyy-MM-dd HH:mm' format if one-time, cron expression if cron. The minimum interval is 5 minute.",
+                "排程的時間，格式為 'yyyy-MM-dd HH:mm'（一次性）或 cron 表達式（定期）。最小間隔為 5 分鐘。",
               ),
-            type: z.enum(["one-time", "cron"]).describe("The type of the job."),
-            message: z
-              .string()
-              .describe("The message to sent when the job runs."),
+            type: z.enum(["one-time", "cron"]).describe("排程類型。"),
+            message: z.string().describe("提醒的內容。"),
           }),
           execute: async ({ name, schedule, type, message }) => {
             const { data: job, error } = await repository.createJob({
@@ -904,31 +817,31 @@ Output valid JSON only with the field { "thoughts" }.
               },
             });
             if (error) {
-              return "Could not schedule the job. Please try again later.";
+              return "無法安排提醒。請稍後再試。";
             }
-            return `Job scheduled successfully: ${job.name} (Status: ${job.status}, Schedule: ${job.schedule}, Type: ${job.type}, Message: ${message})`;
+            return `提醒安排成功：${job.name} (排程時間: ${job.schedule}, 類型: ${job.type})`;
           },
         }),
         removeJob: tool({
-          description: "Remove a scheduled job for the user.",
+          description: "刪除用戶的提醒。",
           parameters: z.object({
-            id: z.string().describe("The job UUID to remove."),
+            id: z.string().describe("要刪除的提醒的 UUID。"),
           }),
           execute: async ({ id }) => {
             await repository.deleteJobById(id);
-            return "Job removed successfully.";
+            return "提醒刪除成功。";
           },
         }),
         getJobs: tool({
-          description: "Retrieve the user's scheduled jobs.",
+          description: "獲取用戶的所有排程任務。",
           parameters: z.object({}),
           execute: async () => {
             const { data: jobs } = await repository.getJobsByUserId(user.id);
             if (!jobs) {
-              return "Could not retrieve the user's scheduled jobs.";
+              return "無法獲取排程任務列表。請稍後再試。";
             }
             if (jobs.length === 0) {
-              return "The user does not have any scheduled jobs.";
+              return "目前沒有任何排程任務。";
             }
             return jobs;
           },
@@ -943,27 +856,27 @@ Output valid JSON only with the field { "thoughts" }.
               userId: user.id,
               content,
             });
-            if (!memory) return `Memory did not create successfully.`;
-            return `Memory created successfully: ID (DO NOT DISPLAY TO USER): ${memory.id}, Content: ${memory.content}`;
+            if (!memory) return "無法創建記憶。請稍後再試。";
+            return `記憶創建成功：${memory.content} (內部使用 UUID: ${memory.id}， (不要顯示給使用者))`;
           },
         }),
         retrieveMemories: tool({
           description:
-            "Retrieve memories about the user. The query is optional (default is all).",
+            "獲取用戶的記憶，如提供查詢詞，則根據用戶的查詢詞進行搜尋。",
           parameters: z.object({
-            query: z.string().optional().describe("The short query to search."),
+            query: z.string().optional().describe("用戶的查詢詞。"),
           }),
           execute: async ({ query }) => {
             if (!query) {
               const { data: allMemories } =
                 await repository.getMemoriesByUserId(user.id);
               if (!allMemories || allMemories.length === 0) {
-                return "No memories found for the user.";
+                return "沒有找到用戶的記憶。";
               }
               return allMemories
                 .map(
                   (memory) =>
-                    `ID: ${memory.id} (DO NOT DISPLAY TO USER), Content:
+                    `ID: ${memory.id} (不要顯示給使用者), 內容:
             ${memory.content}`,
                 )
                 .join("\n");
@@ -977,12 +890,12 @@ Output valid JSON only with the field { "thoughts" }.
               const { data: allMemories } =
                 await repository.getMemoriesByUserId(user.id);
               if (!allMemories || allMemories.length === 0) {
-                return "No memories found for the user.";
+                return "沒有找到用戶的記憶。";
               }
               return allMemories
                 .map(
                   (memory) =>
-                    `ID: ${memory.id} (DO NOT DISPLAY TO USER), Content:
+                    `ID: ${memory.id} (不要顯示給使用者), 內容:
             ${memory.content}`,
                 )
                 .join("\n");
@@ -990,27 +903,30 @@ Output valid JSON only with the field { "thoughts" }.
             return memories
               .map(
                 (memory) =>
-                  `ID: ${memory.id} (DO NOT DISPLAY TO USER), Content:
+                  `ID: ${memory.id} (不要顯示給使用者), 內容:
             ${memory.content}`,
               )
               .join("\n");
           },
         }),
         deleteMemory: tool({
-          description: "Delete a memory about the user.",
+          description: "刪除用戶的記憶。",
           parameters: z.object({
-            id: z.string().describe("The memory UUID to delete."),
+            id: z.string().describe("要刪除的記憶的 UUID。"),
           }),
           execute: async ({ id }) => {
-            await repository.deleteMemoryById(id);
-            return "Memory deleted successfully.";
+            const { error } = await repository.deleteMemoryById(id);
+            if (error) {
+              return "無法刪除記憶。請稍後再試。";
+            }
+            return "記憶刪除成功。";
           },
         }),
         userFeedback: tool({
           description:
-            "Collect user feedback or bug reports on the Lio's performance.",
+            "用戶反饋或錯誤報告的工具，將用戶的反饋或錯誤報告保存到資料庫。",
           parameters: z.object({
-            feedback: z.string().describe("User's feedback or bug report."),
+            feedback: z.string().describe("用戶的反饋或錯誤報告。"),
           }),
           execute: async ({ feedback }) => {
             const { error } = await repository.createFeedback({
@@ -1019,9 +935,9 @@ Output valid JSON only with the field { "thoughts" }.
             });
             if (error) {
               console.error("Error saving user feedback:", error);
-              return "Could not save user feedback. Please try again later.";
+              return "無法保存用戶反饋。請稍後再試。";
             }
-            return "User feedback received.";
+            return "用戶反饋已成功保存。感謝您的反饋！";
           },
         }),
       },
